@@ -1,0 +1,11 @@
+{
+	"files.associations": {
+		"mem.h": "c",
+		"mman.h": "c",
+		"stddef.h": "c",
+		"array": "c",
+		"string_view": "c",
+		"initializer_list": "c",
+		"utility": "c"
+	}
+}
