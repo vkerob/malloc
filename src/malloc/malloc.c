@@ -3,12 +3,10 @@
 
 void	*malloc(size_t size)
 {
-	write(1, "malloc\n", 7);
 	size_t			pagesize = getpagesize();
 	int				size_block = sizeof(t_mem_block);
 	void			*start_user_space_tmp;
 	static t_data	*data = NULL;
-	t_heap			*heap;
 
 	if (data == NULL)
 		initialize_data(&data);
@@ -17,16 +15,16 @@ void	*malloc(size_t size)
 		if (size <= pagesize * TINY - size_block)
 		{
 			start_user_space_tmp = find_free_space(data->tiny, size);
-			heap = data->tiny;
+			if (start_user_space_tmp == NULL)
+				allocate(data, &(data->tiny), size, TINY);
 		}
 		else
 		{
 			start_user_space_tmp = find_free_space(data->small, size);
-			heap = data->small;
+			if (start_user_space_tmp == NULL)
+				allocate(data, &(data->small), size, SMALL);
 		}
-		if (start_user_space_tmp == NULL)
-			allocate(data, heap, size, TINY);
-		else
+		if (start_user_space_tmp != NULL)
 			return (start_user_space_tmp);
 	}
 	else

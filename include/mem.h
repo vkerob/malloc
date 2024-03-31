@@ -64,7 +64,7 @@ void	initialize_data(t_data **data);
 void	initialize_heap(t_heap *heap, size_t size);
 void	initialize_block(t_mem_block *block, size_t size, t_mem_block *block_prev);
 
-void	allocate(t_data *data, t_heap *heap, size_t size, size_t type);
+void	allocate(t_data *data, t_heap **heap, size_t size, size_t type);
 void	allocate_large(t_data *data, size_t size);
 
 void	*find_free_space(t_heap *heap, size_t size);
