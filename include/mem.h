@@ -13,6 +13,7 @@
 
 // struct for each heap
 
+
 typedef struct heap
 {
 	int					size;				// size of each block
@@ -27,10 +28,16 @@ typedef struct heap_large
 	struct heap_large	*next;
 }				t_heap_large;
 
+typedef struct user_space
+{
+	void				*start_user_space;
+	size_t				size_allocated;
+}				t_user_space;
+
+
 typedef struct mem_block
 {
-	void				*start_user_space;	// start of the block
-	int					free_size;			// size of the block
+	struct user_space	user_space;			// user space
 	struct free_space	*free_area;			// free space
 	struct mem_block	*next;				// next block
 	struct mem_block	*prev;				// previous block
@@ -39,8 +46,7 @@ typedef struct mem_block
 
 typedef struct free_space
 {
-	void				*start;				// start of the free space
-	size_t				size;				// size of the free space
+	struct user_space	user_space;			// user space
 	struct free_space	*next;				// next free space
 	struct free_space	*prev;				// previous free space
 }				t_free_space;
@@ -54,11 +60,12 @@ typedef struct	data
 	void				*start_user_space;
 }				t_data;
 
+extern t_data *data;
 
 void	show_alloc_mem();
 // void	free(void *ptr);
 void	*malloc(size_t size);
-// void	*realloc(void *ptr, size_t size);
+void	*realloc(void *ptr, size_t size);
 
 void	initialize_data(t_data **data);
 void	initialize_heap(t_heap *heap, size_t size);

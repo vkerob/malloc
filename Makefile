@@ -1,6 +1,6 @@
 CC=gcc
 
-CFLAGS= -Wall -Wextra -Werror -g
+CFLAGS= -Wall -Wextra -Werror -fPIC -g
 
 SRC=	src/main.c \
 		src/malloc/malloc.c \
@@ -39,3 +39,5 @@ fclean: clean
 	rm -rf libft_malloc.so obj
 
 re: fclean all
+
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)

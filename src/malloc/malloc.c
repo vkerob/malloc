@@ -1,12 +1,13 @@
 #include "../../include/mem.h"
 #include <unistd.h>
 
+t_data	*data = NULL;
+
 void	*malloc(size_t size)
 {
 	size_t			pagesize = getpagesize();
 	int				size_block = sizeof(t_mem_block);
 	void			*start_user_space_tmp;
-	static t_data	*data = NULL;
 
 	if (data == NULL)
 		initialize_data(&data);
