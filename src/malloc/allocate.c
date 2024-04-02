@@ -34,9 +34,9 @@ void	allocate(t_data *data, t_heap **heap, size_t size, size_t type)
 	initialize_block(block_tmp, type, block_prev);
 	(*heap)->count_blocks++;
 	block_tmp->free_area = mmap(NULL, sizeof(t_free_space), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-	block_tmp->free_area->start = block_tmp->start_user_space + size;	// set the start of the free space to the end of the allocated space
-	data->start_user_space = block_tmp->free_area->start;
-	block_tmp->free_area->size -= size;
+	block_tmp->free_area->start_free_space = block_tmp->user_space->start_user_space + size;	// set the start of the free space to the end of the allocated space
+	data->return_user_space = block_tmp->user_space->start_user_space;
+	block_tmp->free_area->free_size = getpagesize() * type - size;		// set the free size to the remaining space
 	if (block_prev != NULL)												// if there is a previous block
 	{
 		block_tmp->free_area->prev = block_prev->free_area;				// set the previous free space to the previous block's free space

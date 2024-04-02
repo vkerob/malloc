@@ -32,5 +32,5 @@ void	*malloc(size_t size)
 		allocate_large(data, size);
 	if (data->error)
 		return (NULL);
-	return (data->start_user_space);
+	return (data->return_user_space);
 }

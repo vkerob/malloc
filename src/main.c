@@ -9,6 +9,6 @@ int main()
 	str2[0] = 'a';
 	write(1, str2, 1);
 	void * test = realloc(str1, 2 * sizeof(char));
-	(void)test;
+	write(1, test, 2);
 	return (0);
 }

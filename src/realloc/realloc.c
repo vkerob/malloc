@@ -10,31 +10,38 @@ void	find_area_or_allocate(t_heap *heap, size_t size, size_t type)
 
 	start_user_space_tmp = find_free_space(data->tiny, size);
 	if (start_user_space_tmp != NULL)										// if we found a free space
-		data->start_user_space = start_user_space_tmp;						// set the start_user_space to the start of the free space
+		data->return_user_space = start_user_space_tmp;						// set the start_user_space to the start of the free space
 	else
-		allocate(data, &(data->tiny), size, type);
+		allocate(data, &heap, size, type);
 }
 
 void	*realloc(void *ptr, size_t size)
 {
 	t_mem_block	*tiny_tmp;
-	t_mem_block	*small_tmp;
+	//t_mem_block	*small_tmp;
+	size_t		i;
+	size_t		page_size = getpagesize();
 
 	// find space for the new size
-	if (size <= getpagesize() * TINY)
+	if (size <= page_size * TINY)
 	{
 		find_area_or_allocate(data->tiny, size, TINY);			// find the area or allocate a new one
 		tiny_tmp = data->tiny->start_block;
 		while (tiny_tmp)
 		{
-			if (tiny_tmp->start_user_space == ptr)							// if we found the block
+			if (tiny_tmp->user_space->start_user_space == ptr)							// if we found the block
 				break ;
 			tiny_tmp = tiny_tmp->next;
 		}
-		while (tiny_tmp->free_size)
-
+		i = 0;
+		while (i < tiny_tmp->user_space->size_allocated)
+		{
+			((char *)data->return_user_space)[i] = ((char *)ptr)[i];
+			i++;
+		}
+		munmap(tiny_tmp->user_space->start_user_space, tiny_tmp->user_space->size_allocated);
 	}
-	else if (size <= getpagesize() * SMALL)
+	else if (size <= page_size * SMALL)
 	{
 		find_area_or_allocate(data->small, size, SMALL);
 	}
@@ -48,5 +55,5 @@ void	*realloc(void *ptr, size_t size)
 	
 	if (data->error)
 		return (NULL);
-	return (data->start_user_space);
+	return (data->return_user_space);
 }

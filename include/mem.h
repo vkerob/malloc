@@ -32,21 +32,25 @@ typedef struct user_space
 {
 	void				*start_user_space;
 	size_t				size_allocated;
+	struct user_space	*next;
 }				t_user_space;
 
 
 typedef struct mem_block
 {
-	struct user_space	user_space;			// user space
+	struct user_space	*user_space;		// user space
 	struct free_space	*free_area;			// free space
 	struct mem_block	*next;				// next block
 	struct mem_block	*prev;				// previous block
 	
 }				t_mem_block;
 
+// each block has a free space
+
 typedef struct free_space
 {
-	struct user_space	user_space;			// user space
+	size_t				free_size;
+	void 				*start_free_space;
 	struct free_space	*next;				// next free space
 	struct free_space	*prev;				// previous free space
 }				t_free_space;
@@ -57,7 +61,7 @@ typedef struct	data
 	struct heap			*small;
 	struct heap_large	*large;
 	bool				error;
-	void				*start_user_space;
+	void				*return_user_space;
 }				t_data;
 
 extern t_data *data;
