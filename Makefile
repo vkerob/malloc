@@ -4,10 +4,11 @@ CFLAGS= -Wall -Wextra -Werror -fPIC -g
 
 SRC=	src/main.c \
 		src/malloc/malloc.c \
-		src/malloc/utils.c \
+		src/malloc/init_struct.c \
         src/malloc/allocate.c \
 		src/free/free.c \
 		src/realloc/realloc.c \
+		src/realloc/find_old_are_copy_and_free.c \
 		src/show_alloc_mem.c \
 		src/utils.c \
 
