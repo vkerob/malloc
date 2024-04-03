@@ -24,8 +24,10 @@ typedef struct heap
 
 typedef struct heap_large
 {
-	struct mem_block	*block;
+	void				*start_user_space;
+	size_t				size_allocated;
 	struct heap_large	*next;
+	struct heap_large	*prev;
 }				t_heap_large;
 
 typedef struct user_space
@@ -33,6 +35,7 @@ typedef struct user_space
 	void				*start_user_space;
 	size_t				size_allocated;
 	struct user_space	*next;
+	struct user_space	*prev;
 }				t_user_space;
 
 
@@ -73,12 +76,12 @@ void	*realloc(void *ptr, size_t size);
 
 void	initialize_data(t_data **data);
 void	initialize_heap(t_heap *heap, size_t size);
-void	initialize_block(t_mem_block *block, size_t size, t_mem_block *block_prev);
+void	initialize_block(t_heap **heap, t_mem_block *block, size_t size, t_mem_block *block_prev, size_t type);
 
-void	allocate(t_data *data, t_heap **heap, size_t size, size_t type);
-void	allocate_large(t_data *data, size_t size);
+void	allocate(t_heap **heap, size_t size, size_t type);
+void	allocate_large(size_t size);
 
-void	*find_free_space(t_heap *heap, size_t size);
+bool	find_free_space(t_heap *heap, size_t size);
 
 
 
