@@ -91,7 +91,7 @@ void	find_ptr(t_user_space **user_space_tmp, t_heap_large **heap_large_tmp ,void
 
 
 // realloc utils functions
-void	find_old_are_copy_and_free(void *ptr, size_t size);
+void	find_old_area_copy_and_free(void *ptr, size_t size);
 void	find_new_area_or_allocate(t_heap *heap, size_t size, size_t type);
 
 

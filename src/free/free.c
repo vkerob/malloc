@@ -61,18 +61,14 @@ void	free(void *ptr)
 			free_area_tmp = free_area_tmp->next;
 		}
 		// create new free_area
-		free_area_add =  mmap(NULL, sizeof(t_free_space), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+		free_area_add = mmap(NULL, sizeof(t_free_space), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 		free_area_add->start_free_space = user_space_tmp->start_user_space;
 		free_area_add->free_size = user_space_tmp->size_allocated;
 		free_area_add->next = free_area_tmp->next;
 		free_area_add->prev = free_area_prev;
 
 		// link free_area
-		free_area_tmp->prev = free_area_add;
-		if (free_area_prev != NULL)
-			free_area_prev->next = free_area_add;
-		else
-			user_space_tmp->parent_block->free_area = free_area_add;
+		
 
 		// defragement, combine free_area if possible
 		defragement_prev(free_area_add);

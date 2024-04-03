@@ -8,7 +8,7 @@ SRC=	src/main.c \
         src/malloc/allocate.c \
 		src/free/free.c \
 		src/realloc/realloc.c \
-		src/realloc/find_old_are_copy_and_free.c \
+		src/realloc/find_old_area_copy_and_free.c \
 		src/show_alloc_mem.c \
 		src/utils.c \
 

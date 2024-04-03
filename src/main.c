@@ -68,16 +68,18 @@ void print_all_structures()
 int main()
 {
 	char *str1 = malloc(5000 * sizeof(char));
-	print_all_structures();
+	//print_all_structures();
 	str1[0] = 'a';
 	str1[1] = 'b';
 	str1[2] = 'c';
 	write(1, str1, 1);
-	free(str1);
-	// char *str2 = malloc(1 * sizeof(char));
-	// str2[0] = 'a';
-	// write(1, str2, 1);
-	// void * test = realloc(str1, 2 * sizeof(char));
-	// write(1, test, 2);
+	char *str2 = malloc(1 * sizeof(char));
+	str2[0] = 'a';
+	write(1, str2, 1);
+	char * test = realloc(str1, 2 * sizeof(char));
+	write(1, "\n", 1);
+	write(1, test, 2);
+	free(test);
+	free(str2);
 	return (0);
 }

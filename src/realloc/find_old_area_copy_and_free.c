@@ -18,11 +18,7 @@ void	copy_and_free(t_user_space *user_space_tmp, void *ptr, size_t size)
 		((char *)data->return_user_space)[i] = ((char *)ptr)[i];
 		i++;
 	}
-	if (user_space_tmp->prev != NULL)
-		user_space_tmp->prev->next = user_space_tmp->next;
-	if (user_space_tmp->next != NULL)
-		user_space_tmp->next->prev = user_space_tmp->prev;
-	munmap(user_space_tmp->start_user_space, user_space_tmp->size_allocated);
+	free(ptr);
 }
 
 void	copy_and_free_large(t_heap_large *heap_large_tmp, void *ptr, size_t size)
@@ -41,14 +37,16 @@ void	copy_and_free_large(t_heap_large *heap_large_tmp, void *ptr, size_t size)
 	munmap(heap_large_tmp->start_user_space, heap_large_tmp->size_allocated);
 }
 
-void	find_old_are_copy_and_free(void *ptr, size_t size)
+void	find_old_area_copy_and_free(void *ptr, size_t size)
 {
 	t_user_space	*user_space_tmp;
 	t_heap_large	*heap_large_tmp;
+	size_t			type;
 
-	find_ptr(&user_space_tmp, &heap_large_tmp, ptr);
+	find_ptr(&user_space_tmp, &heap_large_tmp, ptr, &type);
 	if (user_space_tmp)
 		copy_and_free(user_space_tmp, ptr, size);
 	else
 		copy_and_free_large(heap_large_tmp, ptr, size);
+	(void)type;
 }
