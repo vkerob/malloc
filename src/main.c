@@ -79,7 +79,7 @@ int main()
 	char * test = realloc(str1, 2 * sizeof(char));
 	write(1, "\n", 1);
 	write(1, test, 2);
-	free(test);
 	free(str2);
+	free(test);
 	return (0);
 }

@@ -37,8 +37,15 @@ bool	find_free_space(t_heap *heap, size_t size)
 					user_space->size_allocated = size;
 					free_area->start_free_space += size;
 					free_area->free_size -= size;
+					user_space->parent_block = block;
+
 					user_space->next = NULL;
 					user_space->prev = user_space_prev;
+					if (user_space_prev)
+						user_space_prev->next = user_space;
+					else
+						block->user_space = user_space;
+					
 					data->return_user_space = user_space->start_user_space;
 				}
 				return (true);
