@@ -20,9 +20,6 @@ void	defragement_next(t_free_space *free_area)
 {
 	t_free_space	*free_area_next;
 
-	if (free_area == NULL)
-		return ;
-	free_area = free_area->prev;
 	free_area_next = free_area->next;
 	if (free_area_next != NULL)
 	{
@@ -35,6 +32,30 @@ void	defragement_next(t_free_space *free_area)
 	}
 }
 
+void defragment(t_free_space *free_area) 
+{
+    t_free_space *prev = free_area->prev;
+    t_free_space *next = free_area->next;
+
+    if (prev != NULL) {
+        prev->free_size += free_area->free_size;
+        prev->next = next;
+        if (next != NULL)
+            next->prev = prev;
+        munmap(free_area, sizeof(t_free_space));
+        defragment(prev);
+    }
+
+    if (next != NULL) {
+        free_area->free_size += next->free_size;
+        free_area->next = next->next;
+        if (next->next != NULL)
+            next->next->prev = free_area;
+        munmap(next, sizeof(t_free_space));
+        defragment(free_area);
+    }
+}
+
 void	free(void *ptr)
 {
 	t_user_space	*user_space_tmp;
@@ -43,7 +64,7 @@ void	free(void *ptr)
 	t_free_space	*free_area_tmp;
 	t_free_space	*free_area_add;
 	t_mem_block		*block_tmp;
-	t_free_space	*free_area_next;
+	//t_free_space	*free_area_defragement;
 	size_t			page_size = getpagesize();
 	size_t			type;
 
@@ -81,9 +102,7 @@ void	free(void *ptr)
 		
 
 		// defragement, combine free_area if possible
-		free_area_next = free_area_add->next;
-		defragement_prev(free_area_add);
-		defragement_next(free_area_next);
+		defragment(free_area_add);
 		if (type == TINY)
 		{
 			if (user_space_tmp->parent_block->free_area->free_size == page_size * TINY)
