@@ -6,11 +6,14 @@ SRC=	src/main.c \
 		src/malloc/malloc.c \
 		src/malloc/init_struct.c \
         src/malloc/allocate.c \
-		src/free/free.c \
 		src/realloc/realloc.c \
 		src/realloc/find_old_area_copy_and_free.c \
+		src/free/free.c \
+		src/free/delete.c \
+		src/free/delink.c \
 		src/show_alloc_mem.c \
-		src/utils.c \
+		src/find_ptr.c \
+		src/find_free_space.c
 
 
 OBJ_DIR = obj

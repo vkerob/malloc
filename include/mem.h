@@ -27,16 +27,16 @@ typedef struct heap_large
 	void				*start_user_space;
 	size_t				size_allocated;
 	struct heap_large	*next;
-	struct heap_large	*prev;
+	struct heap_large	*prev;				// needed for delink
 }				t_heap_large;
 
 typedef struct user_space
 {
 	void				*start_user_space;
 	size_t				size_allocated;
+	struct mem_block	*parent_block;
 	struct user_space	*next;
 	struct user_space	*prev;
-	struct mem_block	*parent_block;
 }				t_user_space;
 
 
@@ -45,7 +45,7 @@ typedef struct mem_block
 	struct user_space	*user_space;		// user space
 	struct free_space	*free_area;			// free space
 	struct mem_block	*next;				// next block
-	struct mem_block	*prev;				// previous block
+	struct mem_block	*prev;				// previous block (needed for free_area)
 	
 }				t_mem_block;
 
@@ -94,5 +94,14 @@ void	find_ptr(t_user_space **user_space_tmp, t_heap_large **heap_large_tmp ,void
 void	find_old_area_copy_and_free(void *ptr, size_t size);
 void	find_new_area_or_allocate(t_heap *heap, size_t size, size_t type);
 
+// free utils functions
+// delink functions
+void	delink_heap_large(t_heap_large *heap_large);
+void	delink_user_space(t_user_space *user_space);
+// delete functions
+void	delete_user_space_or_block(t_user_space *user_space, size_t type, size_t page_size);
+void	delete_heap_large(t_heap_large *heap_large, size_t page_size);
+// add functions
+void add_free_area_and_defragment(t_user_space *user_space);
 
 #endif

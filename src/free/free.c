@@ -1,180 +1,27 @@
 #include "../../include/mem.h"
 
-void	defragement_prev(t_free_space *free_area)
-{
-	t_free_space	*free_area_prev;
-
-	free_area_prev = free_area->prev;
-	if (free_area_prev != NULL)
-	{
-		free_area_prev->free_size += free_area->free_size;
-		free_area_prev->next = free_area->next;
-		if (free_area->next != NULL)
-			free_area->next->prev = free_area_prev;
-		munmap(free_area, sizeof(t_free_space));
-		defragement_prev(free_area_prev);
-	}
-}
-
-void	defragement_next(t_free_space *free_area)
-{
-	t_free_space	*free_area_next;
-
-	free_area_next = free_area->next;
-	if (free_area_next != NULL)
-	{
-		free_area->free_size += free_area_next->free_size;
-		free_area->next = free_area_next->next;
-		if (free_area_next->next != NULL)
-			free_area_next->next->prev = free_area;
-		munmap(free_area_next, sizeof(t_free_space));
-		defragement_next(free_area);
-	}
-}
-
-void defragment(t_free_space *free_area) 
-{
-    t_free_space *prev = free_area->prev;
-    t_free_space *next = free_area->next;
-
-    if (prev != NULL) {
-        prev->free_size += free_area->free_size;
-        prev->next = next;
-        if (next != NULL)
-            next->prev = prev;
-        munmap(free_area, sizeof(t_free_space));
-        defragment(prev);
-    }
-
-    if (next != NULL) {
-        free_area->free_size += next->free_size;
-        free_area->next = next->next;
-        if (next->next != NULL)
-            next->next->prev = free_area;
-        munmap(next, sizeof(t_free_space));
-        defragment(free_area);
-    }
-}
-
 void	free(void *ptr)
 {
 	t_user_space	*user_space_tmp;
 	t_heap_large	*heap_large_tmp;
-	t_free_space	*free_area_prev = NULL;
-	t_free_space	*free_area_tmp;
-	t_free_space	*free_area_add;
-	t_mem_block		*block_tmp;
-	//t_free_space	*free_area_defragement;
 	size_t			page_size = getpagesize();
 	size_t			type;
 
 	find_ptr(&user_space_tmp, &heap_large_tmp, ptr, &type);
 	if (user_space_tmp)
 	{
-		// unlink user_space
-		if (user_space_tmp->prev != NULL)
-			user_space_tmp->prev->next = user_space_tmp->next;
-		if (user_space_tmp->next != NULL)
-			user_space_tmp->next->prev = user_space_tmp->prev;
-		
-		//find position of new free_area in free_area ( sorted by memory address, from largest to smallest)
-		free_area_tmp = user_space_tmp->parent_block->free_area;
-		while (free_area_tmp->start_free_space > user_space_tmp->start_user_space && free_area_tmp->next != NULL)
-			free_area_tmp = free_area_tmp->next;
+		delink_user_space(user_space_tmp);
+		add_free_area_and_defragment(user_space_tmp);
+		if (data->error)
 		{
-			if (free_area_tmp->next == NULL)
-				free_area_prev = free_area_tmp;
-			free_area_tmp = free_area_tmp->next;
+			free_all();
+			return ;
 		}
-		// create new free_area
-		free_area_add = mmap(NULL, sizeof(t_free_space), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-		free_area_add->start_free_space = user_space_tmp->start_user_space;
-		free_area_add->free_size = user_space_tmp->size_allocated;
-
-		free_area_add->next = free_area_tmp;
-		free_area_add->prev = free_area_prev;
-
-		// link free_area
-		if (free_area_prev != NULL)
-			free_area_prev->next = free_area_add;
-		if (free_area_tmp != NULL)
-			free_area_tmp->prev = free_area_add;
-		
-
-		// defragement, combine free_area if possible
-		defragment(free_area_add);
-		if (type == TINY)
-		{
-			if (user_space_tmp->parent_block->free_area->free_size == page_size * TINY)
-			{
-				// free block if no user_space
-				block_tmp = user_space_tmp->parent_block;
-
-				munmap(user_space_tmp->parent_block->user_space, sizeof(t_user_space) + page_size * TINY);
-				munmap(block_tmp->free_area, sizeof(t_free_space));
-				
-				// unlink block
-				if (block_tmp->prev != NULL)
-					block_tmp->prev->next = block_tmp->next;
-				if (block_tmp->next != NULL)
-					block_tmp->next->prev = block_tmp->prev;
-				
-				munmap(block_tmp, sizeof(t_mem_block));
-				block_tmp = NULL;
-				// free heap if no user_space
-				if (data->tiny->start_block == NULL)
-				{
-					munmap(data->tiny, sizeof(t_heap));
-					data->tiny = NULL;
-				}
-			}
-			else
-				munmap(user_space_tmp->start_user_space, user_space_tmp->size_allocated);
-		}
-		else
-		{
-			if (user_space_tmp->parent_block->free_area->free_size == page_size * SMALL)
-			{
-				block_tmp = user_space_tmp->parent_block;
-
-				munmap(user_space_tmp->parent_block->user_space, sizeof(t_user_space) + page_size * SMALL);
-				munmap(block_tmp->free_area, sizeof(t_free_space));
-				
-				// unlink block
-				if (block_tmp->prev != NULL)
-					block_tmp->prev->next = block_tmp->next;
-				if (block_tmp->next != NULL)
-					block_tmp->next->prev = block_tmp->prev;
-				
-				munmap(block_tmp, sizeof(t_mem_block));
-				block_tmp = NULL;
-				if (data->small->start_block == NULL)
-				{
-					munmap(data->small, sizeof(t_heap));
-					data->small = NULL;
-				}
-			}
-			else
-				munmap(user_space_tmp->start_user_space, user_space_tmp->size_allocated);
-		}
-		
+		delete_user_space_or_block(user_space_tmp, type, page_size);
 	}
 	else
 	{
-		// unlink heap_large
-		if (heap_large_tmp->prev != NULL)
-			heap_large_tmp->prev->next = heap_large_tmp->next;
-		if (heap_large_tmp->next != NULL)
-			heap_large_tmp->next->prev = heap_large_tmp->prev;
-		// free heap_large
-		munmap(heap_large_tmp->start_user_space, heap_large_tmp->size_allocated);
-		munmap(heap_large_tmp, sizeof(t_heap_large) + page_size * LARGE);
-		heap_large_tmp = NULL;
-		// free heap if no user_space
-		if (data->large == NULL)
-		{
-			munmap(data->large, sizeof(t_heap_large));
-			data->large = NULL;
-		}
+		delink_heap_large(heap_large_tmp);
+		delete_heap_large(heap_large_tmp, page_size);
 	}
 }

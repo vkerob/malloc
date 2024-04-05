@@ -23,16 +23,16 @@ void	allocate(t_heap **heap, size_t size, size_t type)
 	block_tmp = (*heap)->start_block;
 	if (block_tmp != NULL)
 	{
+		// find the last block
 		while (block_tmp->next)
 			block_tmp = block_tmp->next;
 		block_prev = block_tmp;											// set the previous block to the last block
 		block_tmp = block_tmp->next;
 	}
-	block_tmp = mmap(NULL, sizeof(t_mem_block), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+	block_tmp = mmap(NULL, sizeof(t_mem_block) + getpagesize() * type, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 	if (block_tmp == MAP_FAILED)
 	{
 		data->error = true;
-		munmap(heap, sizeof(t_heap));
 		return ;
 	}
 	initialize_block(heap, block_tmp, size, block_prev, type);
