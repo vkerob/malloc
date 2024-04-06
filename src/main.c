@@ -89,7 +89,6 @@ void print_all_structures()
 int main()
 {
 	char *str1 = malloc(5000 * sizeof(char));
-	//print_all_structures();
 	str1[0] = 'a';
 	str1[1] = 'b';
 	str1[2] = 'c';
@@ -100,6 +99,7 @@ int main()
 	char * test = realloc(str1, 2 * sizeof(char));
 	write(1, "\n", 1);
 	write(1, test, 2);
+	show_alloc_mem();
 	free(str2);
 	free(test);
 	return (0);

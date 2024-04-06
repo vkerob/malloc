@@ -13,7 +13,7 @@ void	initialize_data(t_data **data)
 	(*data)->user_space_pointer = NULL;
 }
 
-static void	initialize_user_space(t_heap  *heap, t_block **block, size_t size)
+static void	initialize_user_space(t_heap  *heap, t_block **block, size_t size, size_t type)
 {
 	(*block)->user_space = mmap(NULL, sizeof(t_user_space), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if ((*block)->user_space == MAP_FAILED)
@@ -29,7 +29,7 @@ static void	initialize_user_space(t_heap  *heap, t_block **block, size_t size)
 	
 	// update free_area
 	heap->free_area->start_free_space = (*block)->user_space->start_user_space + size;
-	heap->free_area->free_size = getpagesize() * TINY - size;
+	heap->free_area->free_size = getpagesize() * type - size;
 	data->user_space_pointer = (*block)->user_space->start_user_space;
 }
 
@@ -91,5 +91,5 @@ void	initialize_block(t_heap *heap, t_block **block, size_t size, t_block *block
 		(*block)->prev = NULL;
 	}
 	(*block)->next = NULL;
-	initialize_user_space(heap, block, size);
+	initialize_user_space(heap, block, size, type);
 }

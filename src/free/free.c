@@ -2,6 +2,8 @@
 
 void	free(void *ptr)
 {
+	t_data *data2 = data;
+	(void)data2;
 	t_user_space	*user_space_tmp;
 	t_heap_large	*heap_large_tmp;
 	size_t			page_size = getpagesize();
