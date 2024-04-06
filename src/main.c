@@ -1,18 +1,70 @@
 #include "../include/mem.h"
 
 void print_data(t_data *data) {
-    printf("Data tiny: %p\n", data->tiny);
-    printf("Data small: %p\n", data->small);
-    printf("Data large: %p\n", data->large);
+    printf("Data tiny: %p\n", data->tiny_heap);
+    printf("Data small: %p\n", data->small_heap);
+    printf("Data large: %p\n", data->large_heap);
     printf("Data error: %d\n", data->error);
-    printf("Data return_user_space: %p\n", data->return_user_space);
+    printf("Data return_user_space: %p\n", data->user_space_pointer);
+}
+
+void print_user_space(t_user_space *user_space) {
+	if (user_space == NULL)
+		return ;
+	while (user_space->next)
+	{
+		printf("User Space start_user_space: %p\n", user_space->start_user_space);
+		printf("User Space size_allocated: %zu\n\n", user_space->size_allocated);
+		printf("User Space parent_block: %p\n\n", user_space->parent_block);
+		printf("User Space next: %p\n\n", user_space->next);
+		printf("User Space prev: %p\n\n", user_space->prev);
+		user_space = user_space->next;
+	}
+    // Vous devrez peut-être créer des fonctions séparées pour imprimer les détails des éléments suivants et précédents
+}
+
+void print_free_space(t_free_space *free_space) {
+	if (free_space == NULL)
+		return ;
+	while (free_space->next)
+	{
+		printf("Free Space free_size: %zu\n", free_space->free_size);
+		printf("Free Space start_free_space: %p\n\n", free_space->start_free_space);
+		printf("Free Space next: %p\n\n", free_space->next);
+		printf("Free Space prev: %p\n\n", free_space->prev);
+		free_space = free_space->next;
+	}
+    // Vous devrez peut-être créer des fonctions séparées pour imprimer les détails des éléments suivants et précédents
+}
+
+void print_block(t_block *mem_block) {
+	if (mem_block == NULL)
+		return ;
+	while (mem_block->user_space)
+	{
+    	printf("Mem Block user_space: %p\n\n", mem_block->user_space);
+		printf("Mem Block next: %p\n\n", mem_block->next);
+		printf("Mem Block prev: %p\n\n", mem_block->prev);
+		print_user_space(mem_block->user_space);
+		mem_block->user_space = mem_block->user_space->next;
+	}
+    // Vous devrez peut-être créer une fonction séparée pour imprimer les détails de free_space
+    // Vous devrez peut-être créer des fonctions séparées pour imprimer les détails des éléments suivants et précédents
 }
 
 void print_heap(t_heap *heap) {
 	if (heap == NULL)
 		return ;
-    printf("Heap size: %d\n", heap->size);
-    printf("Heap count_blocks: %d\n\n", heap->count_blocks);
+    printf("Heap size: %zu\n", heap->size);
+	printf("Heap start_block: %p\n\n", heap->start_block);
+	printf("Heap free_area: %p\n\n", heap->free_area);
+	print_free_space(heap->free_area);
+	while (heap->start_block)
+	{
+		print_block(heap->start_block);
+		heap->start_block = heap->start_block->next;
+	}
+
     // Vous devrez peut-être créer une fonction séparée pour imprimer les détails de mem_block
 }
 
@@ -24,45 +76,14 @@ void print_heap_large(t_heap_large *heap_large) {
     // Vous devrez peut-être créer des fonctions séparées pour imprimer les détails des éléments suivants et précédents
 }
 
-void print_mem_block(t_mem_block *mem_block) {
-	if (mem_block == NULL)
-		return ;
-    printf("Mem Block user_space: %p\n\n", mem_block->user_space);
-    // Vous devrez peut-être créer une fonction séparée pour imprimer les détails de free_space
-    // Vous devrez peut-être créer des fonctions séparées pour imprimer les détails des éléments suivants et précédents
-}
 
-void print_user_space(t_user_space *user_space) {
-	if (user_space == NULL)
-		return ;
-    printf("User Space start_user_space: %p\n", user_space->start_user_space);
-    printf("User Space size_allocated: %zu\n\n", user_space->size_allocated);
-    // Vous devrez peut-être créer des fonctions séparées pour imprimer les détails des éléments suivants et précédents
-}
-
-void print_free_space(t_free_space *free_space) {
-	if (free_space == NULL)
-		return ;
-    printf("Free Space free_size: %zu\n", free_space->free_size);
-    printf("Free Space start_free_space: %p\n\n", free_space->start_free_space);
-    // Vous devrez peut-être créer des fonctions séparées pour imprimer les détails des éléments suivants et précédents
-}
 
 void print_all_structures()
 {
     // Vous devrez passer les instances appropriées de vos structures à ces fonctions
     print_data(data);
-    print_heap(data->tiny);
-    print_mem_block(data->tiny->start_block);
-    print_user_space(data->tiny->start_block->user_space);
-    print_free_space(data->tiny->start_block->free_area);
-
-	print_heap(data->small);
-	print_mem_block(data->small->start_block);
-	print_user_space(data->small->start_block->user_space);
-	print_free_space(data->small->start_block->free_area);
-
-    print_heap_large(data->large);
+	print_heap(data->tiny_heap);
+	print_heap(data->small_heap);
 }
 
 int main()

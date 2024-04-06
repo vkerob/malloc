@@ -4,7 +4,7 @@ void	find_new_area_or_allocate(t_heap *heap, size_t size, size_t type)
 {
 	bool			space_found = false;
 
-	space_found = find_free_space(heap, size);
+	space_found = search_free_space(heap, size);
 	if (space_found == false)
 		allocate(&heap, size, type);
 }
@@ -15,7 +15,7 @@ void	copy_and_free(t_user_space *user_space_tmp, void *ptr, size_t size)
 
 	while (i < user_space_tmp->size_allocated && i < size)
 	{
-		((char *)data->return_user_space)[i] = ((char *)ptr)[i];
+		((char *)data->user_space_pointer)[i] = ((char *)ptr)[i];
 		i++;
 	}
 	free(ptr);
@@ -27,7 +27,7 @@ void	copy_and_free_large(t_heap_large *heap_large_tmp, void *ptr, size_t size)
 
 	while (i < heap_large_tmp->size_allocated && i < size)
 	{
-		((char *)data->return_user_space)[i] = ((char *)ptr)[i];
+		((char *)data->user_space_pointer)[i] = ((char *)ptr)[i];
 		i++;
 	}
 	if (heap_large_tmp->prev != NULL)

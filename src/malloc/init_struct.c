@@ -6,99 +6,90 @@ void	initialize_data(t_data **data)
 	*data = (t_data *)mmap(NULL, sizeof(t_data), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (*data == MAP_FAILED)
 		return ;
-	(*data)->tiny = NULL;
-	(*data)->small = NULL;
-	(*data)->large = NULL;
+	(*data)->tiny_heap = NULL;
+	(*data)->small_heap = NULL;
+	(*data)->large_heap = NULL;
 	(*data)->error = false;
-	(*data)->return_user_space = NULL;
+	(*data)->user_space_pointer = NULL;
 }
 
-void	initialize_heap(t_heap *heap, size_t size)
+static void	initialize_user_space(t_heap  *heap, t_block **block, size_t size)
 {
-	heap->size = size;
-	heap->count_blocks = 0;
-	heap->start_block = NULL;
-}
-
-static void	initialize_user_space(t_mem_block *block, size_t size)
-{
-	block->user_space = mmap(NULL, sizeof(t_user_space), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	if (block->user_space == MAP_FAILED)
+	(*block)->user_space = mmap(NULL, sizeof(t_user_space), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	if ((*block)->user_space == MAP_FAILED)
 	{
 		data->error = true;
 		return ;
 	}
-	block->user_space->start_user_space = block->user_space + sizeof(t_mem_block);
-	block->user_space->size_allocated = size;
-	block->user_space->next = NULL;
-	block->user_space->prev = NULL;
+	(*block)->user_space->start_user_space = (*block)->user_space + sizeof(t_block);
+	(*block)->user_space->size_allocated = size;
+	(*block)->user_space->parent_block = *block;
+	(*block)->user_space->next = NULL;
+	(*block)->user_space->prev = NULL;
+	
+	// update free_area
+	heap->free_area->start_free_space = (*block)->user_space->start_user_space + size;
+	heap->free_area->free_size = getpagesize() * TINY - size;
+	data->user_space_pointer = (*block)->user_space->start_user_space;
 }
 
-// void	ft_putchar_fd(char c, int fd)
-// {
-// 	write(fd, &c, 1);
-// }
-
-// void	ft_putnbr_fd(int n, int fd)
-// {
-// 	if (n < 0)
-// 	{
-// 		ft_putchar_fd('-', fd);
-// 		if (n == -2147483648)
-// 		{
-// 			write(fd, "2147483648", 10);
-// 			return ;
-// 		}
-// 		n = -n;
-// 	}
-// 	if (n < 10)
-// 		ft_putchar_fd((n + 48), fd);
-// 	else
-// 	{
-// 		ft_putnbr_fd(n / 10, fd);
-// 		ft_putchar_fd(n % 10 + 48, fd);
-// 	}
-// }
-
-static void	initialize_free_space(t_heap  **heap, t_mem_block *block, size_t size, t_mem_block *block_prev, size_t type)
+static void	initialize_free_area(t_free_space **free_area)
 {
-	block->free_area = mmap(NULL, sizeof(t_free_space), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-	if (block->free_area == MAP_FAILED)
+	*free_area = mmap(NULL, sizeof(t_free_space), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+	if (*free_area == MAP_FAILED)
 	{
 		data->error = true;
 		return ;
 	}
-	block->free_area->start_free_space = block->user_space->start_user_space + size;
-	block->free_area->free_size = getpagesize() * type - size;
-	block->free_area->next = NULL;
-	if (block_prev != NULL)										// if there is a previous block
-	{
-		block->free_area->prev = block_prev->free_area;
-		if (block_prev->free_area != NULL)						// if there is a previous free space
-			block->free_area->prev->next = block->free_area;
-		block_prev->next = block;
-	}
-	else
-	{
-		block->free_area->next = NULL;
-		block->free_area->prev = NULL;
-		(*heap)->start_block = block;
-	}
+	(*free_area)->free_size = 0;
+	(*free_area)->start_free_space = NULL;
+	(*free_area)->next = NULL;
+	(*free_area)->prev = NULL;
 }
 
-void	initialize_block(t_heap  **heap, t_mem_block *block, size_t size, t_mem_block *block_prev, size_t type)
+void	initialize_heap(t_heap **heap, size_t type)
 {
-	initialize_user_space(block, size);
-	initialize_free_space(heap, block, size, block_prev, type);
+
+	(*heap) = mmap(NULL, sizeof(t_heap), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+	if (*heap == MAP_FAILED)
+	{
+		data->error = true;
+		return ;
+	}
+	(*heap)->start_block = NULL;
+	(*heap)->size = getpagesize() * type;
+	initialize_free_area(&((*heap)->free_area));
+}
+
+void	initialize_block(t_heap *heap, t_block **block, size_t size, t_block *block_prev, size_t type)
+{
+	// find the last block
+	(*block) = heap->start_block;
+	if (*block != NULL)
+	{
+		while ((*block)->next)
+			*block = (*block)->next;
+		block_prev = *block;											// set the previous block to the last block
+		*block = (*block)->next;
+	}
+	// allocate the block
+	*block = mmap(NULL, sizeof(t_block) + getpagesize() * type, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+	if (*block == MAP_FAILED)
+	{
+		data->error = true;
+		return ;
+	}
+	// initialize the block
 	if (block_prev != NULL)
 	{
-		block->prev = block_prev;
-		block->prev->next = block;
+		(*block)->prev = block_prev;
+		(*block)->prev->next = *block;
 	}
 	else
-		block->prev = NULL;
-	block->next = NULL;
-	data->return_user_space = block->user_space->start_user_space;
-	(*heap)->count_blocks++;
-	block->user_space->parent_block = block;
+	{
+		heap->start_block = *block;
+		(*block)->prev = NULL;
+	}
+	(*block)->next = NULL;
+	initialize_user_space(heap, block, size);
 }

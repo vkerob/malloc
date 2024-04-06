@@ -10,14 +10,14 @@ void	*realloc(void *ptr, size_t size)
 		if (size <= page_size * TINY)
 		{
 			// find the area or allocate a new one
-			find_new_area_or_allocate(data->tiny, size, TINY);
+			find_new_area_or_allocate(data->tiny_heap, size, TINY);
 			if (data->error == false)
 				// copy the old data to the new area and free the old area
 				find_old_area_copy_and_free(ptr, size);
 		}
 		else
 		{
-			find_new_area_or_allocate(data->small, size, SMALL);
+			find_new_area_or_allocate(data->small_heap, size, SMALL);
 			if (data->error == false)
 				find_old_area_copy_and_free(ptr, size);
 		}
@@ -29,7 +29,7 @@ void	*realloc(void *ptr, size_t size)
 			find_old_area_copy_and_free(ptr, size);
 	}
 	if (data->error == false)
-		return (data->return_user_space);
+		return (data->user_space_pointer);
 	free_all();
 	return (NULL);
 }

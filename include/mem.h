@@ -16,10 +16,9 @@
 
 typedef struct heap
 {
-	int					size;				// size of each block
-	int					count_blocks;		// number of blocks
-	struct mem_block	*start_block;		// start of the heap
-
+	size_t				size;
+	struct block		*start_block;		// start of the heap
+	struct free_space	*free_area;			// free space
 }				t_heap;
 
 typedef struct heap_large
@@ -34,22 +33,20 @@ typedef struct user_space
 {
 	void				*start_user_space;
 	size_t				size_allocated;
-	struct mem_block	*parent_block;
+	struct block		*parent_block;		// needed for realloc
 	struct user_space	*next;
 	struct user_space	*prev;
 }				t_user_space;
 
 
-typedef struct mem_block
+typedef struct block
 {
 	struct user_space	*user_space;		// user space
-	struct free_space	*free_area;			// free space
-	struct mem_block	*next;				// next block
-	struct mem_block	*prev;				// previous block (needed for free_area)
+	struct block		*next;				// next block
+	struct block		*prev;				// previous block (needed for free_area)
 	
-}				t_mem_block;
+}				t_block;
 
-// each block has a free space
 
 typedef struct free_space
 {
@@ -61,11 +58,11 @@ typedef struct free_space
 
 typedef struct	data
 {
-	struct heap			*tiny;
-	struct heap			*small;
-	struct heap_large	*large;
+	struct heap			*tiny_heap;
+	struct heap			*small_heap;
+	struct heap_large	*large_heap;
 	bool				error;
-	void				*return_user_space;
+	void				*user_space_pointer;
 }				t_data;
 
 extern t_data *data;
@@ -78,15 +75,16 @@ void	*realloc(void *ptr, size_t size);
 
 // init functions
 void	initialize_data(t_data **data);
-void	initialize_heap(t_heap *heap, size_t size);
-void	initialize_block(t_heap **heap, t_mem_block *block, size_t size, t_mem_block *block_prev, size_t type);
+void	initialize_heap(t_heap **heap, size_t size);
+void	initialize_block(t_heap *heap, t_block **block, size_t size, t_block *block_prev, size_t type);
 
 // allocate functions
+void	allocate_or_found_space_not_found(t_heap **heap, size_t size, int type);
 void	allocate(t_heap **heap, size_t size, size_t type);
 void	allocate_large(size_t size);
 
 //  general utils functions
-bool	find_free_space(t_heap *heap, size_t size);
+bool	search_free_space(t_heap *heap, size_t size);
 void	find_ptr(t_user_space **user_space_tmp, t_heap_large **heap_large_tmp ,void *ptr, size_t *type);
 
 
@@ -99,9 +97,11 @@ void	find_new_area_or_allocate(t_heap *heap, size_t size, size_t type);
 void	delink_heap_large(t_heap_large *heap_large);
 void	delink_user_space(t_user_space *user_space);
 // delete functions
-void	delete_user_space_or_block(t_user_space *user_space, size_t type, size_t page_size);
+void	delete_user_space_or_block(t_heap *heap, t_user_space *user_space, size_t type, size_t page_size);
 void	delete_heap_large(t_heap_large *heap_large, size_t page_size);
 // add functions
-void add_free_area_and_defragment(t_user_space *user_space);
+void add_free_area_and_defragment(t_heap *heap, t_user_space *user_space);
 
+// free functions
+void	free_all(void);
 #endif

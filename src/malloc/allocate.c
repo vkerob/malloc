@@ -2,67 +2,50 @@
 
 // allocates the heap passed as argument if it doesn't exist, a new block on him and allocates a new user space on the block of the size passed as argument 
 
-void	allocate(t_heap **heap, size_t size, size_t type)
+void	allocate_or_found_space_not_found(t_heap **heap, size_t size, int type)
 {
-	t_mem_block		*block_tmp;
-	t_mem_block		*block_prev = NULL;
-
-	write(1, "allocate\n", 9);
-	// allocates the heap if it doesn't exist
-	if (*heap == NULL)
-	{
-		(*heap) = mmap(NULL, sizeof(t_heap), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-		if (*heap == MAP_FAILED)
-		{
-			data->error = true;
-			return ;
-		}
-		initialize_heap(*heap, type);
-	}
-	// allocates a new block
-	block_tmp = (*heap)->start_block;
-	if (block_tmp != NULL)
-	{
-		// find the last block
-		while (block_tmp->next)
-			block_tmp = block_tmp->next;
-		block_prev = block_tmp;											// set the previous block to the last block
-		block_tmp = block_tmp->next;
-	}
-	block_tmp = mmap(NULL, sizeof(t_mem_block) + getpagesize() * type, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-	if (block_tmp == MAP_FAILED)
-	{
-		data->error = true;
-		return ;
-	}
-	initialize_block(heap, block_tmp, size, block_prev, type);
+	bool is_space_found = search_free_space(*heap, size);
+	if (is_space_found == false && data->error == false)
+		allocate(heap, size, type);
 }
 
+void	allocate(t_heap **heap, size_t size, size_t type)
+{
+	t_block		*block_tmp;
+	t_block		*block_prev = NULL;
 
+	write(1, "allocate\n", 9);
+	if (*heap == NULL)
+		initialize_heap(heap, type);
+	initialize_block(*heap, &block_tmp, size, block_prev, type);			// send block address for initialization of user space parent block
+}
 
 void	allocate_large(size_t size)
 {
-	t_heap_large	*heap_large_tmp;
+	t_heap_large	*new_heap_large;
 	t_heap_large	*heap_large_prev;
 
-	heap_large_tmp = data->large;
-	if (heap_large_tmp != NULL)
+	new_heap_large = data->large_heap;
+	// find the last large heap
+	if (new_heap_large != NULL)
 	{
-		while (heap_large_tmp->next)
-			heap_large_tmp = heap_large_tmp->next;
-		heap_large_prev = heap_large_tmp;
-		heap_large_tmp = heap_large_tmp->next;
+		while (new_heap_large->next)
+			new_heap_large = new_heap_large->next;
+		heap_large_prev = new_heap_large;
+		new_heap_large = new_heap_large->next;
 	}
-	heap_large_tmp = mmap(NULL, sizeof(t_heap_large) + getpagesize() * LARGE, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-	if (heap_large_tmp == MAP_FAILED)
+	// allocate the new large heap
+	new_heap_large = mmap(NULL, sizeof(t_heap_large) + getpagesize() * LARGE, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+	if (new_heap_large == MAP_FAILED)
 	{
 		data->error = true;
 		return ;
 	}
-	heap_large_tmp->start_user_space = heap_large_tmp + sizeof(t_heap_large);
-	heap_large_tmp->size_allocated = size;
-	heap_large_tmp->next = NULL;
-	heap_large_tmp->prev = heap_large_prev;
+	// initialize the new large heap
+	new_heap_large->start_user_space = new_heap_large + sizeof(t_heap_large);
+	new_heap_large->size_allocated = size;
+	new_heap_large->next = NULL;
+	new_heap_large->prev = heap_large_prev;
 	if (heap_large_prev != NULL)
-		heap_large_prev->next = heap_large_tmp;
+		heap_large_prev->next = new_heap_large;
 }

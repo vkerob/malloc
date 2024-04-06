@@ -11,9 +11,10 @@ SRC=	src/main.c \
 		src/free/free.c \
 		src/free/delete.c \
 		src/free/delink.c \
-		src/show_alloc_mem.c \
-		src/find_ptr.c \
-		src/find_free_space.c
+		src/utils/show_alloc_mem.c \
+		src/utils/find_ptr.c \
+		src/utils/search_free_space.c \
+		src/utils/free_all.c
 
 
 OBJ_DIR = obj
