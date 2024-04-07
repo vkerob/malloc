@@ -14,7 +14,6 @@ void	allocate(t_heap **heap, size_t size, size_t type)
 	t_block		*block_tmp;
 	t_block		*block_prev = NULL;
 
-	write(1, "allocate\n", 9);
 	if (*heap == NULL)
 		initialize_heap(heap, type);
 	initialize_block(*heap, &block_tmp, size, block_prev, type);			// send block address for initialization of user space parent block
