@@ -42,6 +42,7 @@ static void set_user_space(t_heap *heap, t_free_space *free_area, size_t size)
 		return ;
 	}
 	user_space->start_user_space = free_area->start_free_space;
+	user_space->ptr_defragment = free_area->start_free_space;
 	data->user_space_pointer = user_space->start_user_space;
 	user_space->size_allocated = size;
 	user_space->parent_block = block;
@@ -64,7 +65,11 @@ static void	reduce_free_area_and_set_user_space(t_heap *heap, t_free_space *free
 		return ;
 	// reduce free area
 	free_area->free_size -= size;
-	free_area->start_free_space += size;
+	if (free_area->free_size != 0)
+		free_area->start_free_space += size;
+	else
+		free_area->start_free_space = NULL;
+
 }
 
 bool	search_free_space(t_heap *heap, size_t size)

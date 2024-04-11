@@ -15,9 +15,9 @@ void	*malloc(size_t size)
 	if (size <= page_size * SMALL)
 	{
 		if (size <= page_size * TINY)
-			allocate_or_found_space_not_found(&(data->tiny_heap), size, TINY);
+			found_space_or_allocate(&(data->tiny_heap), size, TINY);
 		else
-			allocate_or_found_space_not_found(&(data->small_heap), size, SMALL);
+			found_space_or_allocate(&(data->small_heap), size, SMALL);
 	}
 	else
 		allocate_large(size);

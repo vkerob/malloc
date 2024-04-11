@@ -2,7 +2,7 @@
 
 // allocates the heap passed as argument if it doesn't exist, a new block on him and allocates a new user space on the block of the size passed as argument 
 
-void	allocate_or_found_space_not_found(t_heap **heap, size_t size, int type)
+void	found_space_or_allocate(t_heap **heap, size_t size, int type)
 {
 	bool is_space_found = search_free_space(*heap, size);
 	if (is_space_found == false && data->error == false)
@@ -11,12 +11,10 @@ void	allocate_or_found_space_not_found(t_heap **heap, size_t size, int type)
 
 void	allocate(t_heap **heap, size_t size, size_t type)
 {
-	t_block		*block_tmp;
-	t_block		*block_prev = NULL;
 
 	if (*heap == NULL)
 		initialize_heap(heap, type);
-	initialize_block(*heap, &block_tmp, size, block_prev, type);			// send block address for initialization of user space parent block
+	initialize_block(*heap, size, type);
 }
 
 void	allocate_large(size_t size)

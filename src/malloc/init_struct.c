@@ -13,27 +13,7 @@ void	initialize_data(t_data **data)
 	(*data)->user_space_pointer = NULL;
 }
 
-static void	initialize_user_space(t_heap  *heap, t_block **block, size_t size, size_t type)
-{
-	(*block)->user_space = mmap(NULL, sizeof(t_user_space), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	if ((*block)->user_space == MAP_FAILED)
-	{
-		data->error = true;
-		return ;
-	}
-	(*block)->user_space->start_user_space = (*block)->user_space + sizeof(t_block);
-	(*block)->user_space->size_allocated = size;
-	(*block)->user_space->parent_block = *block;
-	(*block)->user_space->next = NULL;
-	(*block)->user_space->prev = NULL;
-	
-	// update free_area
-	heap->free_area->start_free_space = (*block)->user_space->start_user_space + size;
-	heap->free_area->free_size = getpagesize() * type - size;
-	data->user_space_pointer = (*block)->user_space->start_user_space;
-}
-
-static void	initialize_free_area(t_free_space **free_area)
+static void	initialize_free_area(t_free_space **free_area, t_user_space *user_space, size_t size, size_t type)
 {
 	*free_area = mmap(NULL, sizeof(t_free_space), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 	if (*free_area == MAP_FAILED)
@@ -41,10 +21,82 @@ static void	initialize_free_area(t_free_space **free_area)
 		data->error = true;
 		return ;
 	}
-	(*free_area)->free_size = 0;
-	(*free_area)->start_free_space = NULL;
+	(*free_area)->free_size = getpagesize() * type - size;
+	(*free_area)->start_free_space = user_space->start_user_space + size;
+	(*free_area)->ptr_defragment = user_space->ptr_defragment;
 	(*free_area)->next = NULL;
 	(*free_area)->prev = NULL;
+}
+
+static void	initialize_user_space(t_heap  *heap, t_block *block, size_t size, size_t type)
+{
+	t_free_space	*free_area_tmp;
+
+	block->user_space = mmap(NULL, sizeof(t_user_space), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	if (block->user_space == MAP_FAILED)
+	{
+		data->error = true;
+		return ;
+	}
+	block->user_space->start_user_space = block->user_space + sizeof(t_block);
+	block->user_space->ptr_defragment = block->user_space->start_user_space;
+	block->user_space->size_allocated = size;
+	block->user_space->parent_block = block;
+	block->user_space->next = NULL;
+	block->user_space->prev = NULL;
+	
+	// add new free_area
+	if (heap->free_area == NULL)
+		initialize_free_area(&(heap->free_area), block->user_space, size, type);
+	else
+	{
+		free_area_tmp = heap->free_area;
+		while (free_area_tmp->next)
+			free_area_tmp = free_area_tmp->next;
+		free_area_tmp->next = mmap(NULL, sizeof(t_free_space), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+		free_area_tmp->next->start_free_space = block->user_space->start_user_space + size;
+		free_area_tmp->next->ptr_defragment = block->user_space->ptr_defragment;
+		free_area_tmp->next->free_size = getpagesize() * type - size;
+		free_area_tmp->next->next = NULL;
+		free_area_tmp->next->prev = free_area_tmp;
+	}
+
+	data->user_space_pointer = block->user_space->start_user_space;
+}
+
+void	initialize_block(t_heap *heap, size_t size, size_t type)
+{
+	t_block	*block = NULL;
+	t_block	*block_prev = NULL;
+	// find the last block
+	block = heap->start_block;
+	if (block != NULL)
+	{
+		while (block->next)
+			block = block->next;
+		block_prev = block;											// set the previous block to the last block
+		block = block->next;
+	}
+	// allocate the block
+	block = mmap(NULL, sizeof(t_block) + getpagesize() * type, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+	if (block == MAP_FAILED)
+	{
+		data->error = true;
+		return ;
+	}
+	// initialize the block
+	if (block_prev != NULL)
+	{
+		block->prev = block_prev;
+		block->prev->next = block;
+	}
+	else
+	{
+		heap->start_block = block;
+		block->prev = NULL;
+	}
+	block->next = NULL;
+	initialize_user_space(heap, block, size, type);
 }
 
 void	initialize_heap(t_heap **heap, size_t type)
@@ -58,38 +110,4 @@ void	initialize_heap(t_heap **heap, size_t type)
 	}
 	(*heap)->start_block = NULL;
 	(*heap)->size = getpagesize() * type;
-	initialize_free_area(&((*heap)->free_area));
-}
-
-void	initialize_block(t_heap *heap, t_block **block, size_t size, t_block *block_prev, size_t type)
-{
-	// find the last block
-	(*block) = heap->start_block;
-	if (*block != NULL)
-	{
-		while ((*block)->next)
-			*block = (*block)->next;
-		block_prev = *block;											// set the previous block to the last block
-		*block = (*block)->next;
-	}
-	// allocate the block
-	*block = mmap(NULL, sizeof(t_block) + getpagesize() * type, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-	if (*block == MAP_FAILED)
-	{
-		data->error = true;
-		return ;
-	}
-	// initialize the block
-	if (block_prev != NULL)
-	{
-		(*block)->prev = block_prev;
-		(*block)->prev->next = *block;
-	}
-	else
-	{
-		heap->start_block = *block;
-		(*block)->prev = NULL;
-	}
-	(*block)->next = NULL;
-	initialize_user_space(heap, block, size, type);
 }
