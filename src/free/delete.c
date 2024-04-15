@@ -1,8 +1,8 @@
 #include "../../include/mem.h"
 
-static void	delete_block(t_heap **heap, t_block *block, size_t type, size_t page_size)
+static void	delete_block(t_heap **heap, t_block *block)
 {
-	t_free_space *free_area = (*heap)->free_area;
+	t_free_area *free_area = (*heap)->free_area;
 
 	// unlink block
 	if (block->prev != NULL)
@@ -11,12 +11,12 @@ static void	delete_block(t_heap **heap, t_block *block, size_t type, size_t page
 		(*heap)->start_block = block->next;
 	if (block->next != NULL)
 		block->next->prev = block->prev;
-	munmap(block, sizeof(t_block) + page_size * type);
+	munmap(block, sizeof(t_block) + (*heap)->size);
 	block = NULL;
 
 	while (free_area != NULL)
 	{
-		if (free_area->free_size == page_size * type)
+		if (free_area->free_size == (*heap)->size)
 		{
 			//unlink free_area
 			if (free_area->prev != NULL)
@@ -26,7 +26,7 @@ static void	delete_block(t_heap **heap, t_block *block, size_t type, size_t page
 			if (free_area->next != NULL)
 				free_area->next->prev = free_area->prev;
 			
-			munmap(free_area, sizeof(t_free_space));
+			munmap(free_area, sizeof(t_free_area));
 			free_area = NULL;
 			break ;
 		}
@@ -40,32 +40,27 @@ static void	delete_block(t_heap **heap, t_block *block, size_t type, size_t page
 	}
 }
 
-void	delete_user_space_or_block(t_heap *heap, t_user_space *user_space, size_t type, size_t page_size)
+void	delete_user_space_or_block(t_heap **heap, t_user_space *user_space)
 {
 	t_block *block = user_space->parent_block;
 		
 	// unlink user_space
-	if (user_space->prev != NULL)
-		user_space->prev->next = user_space->next;
-	else
-		block->user_space = user_space->next;
-	if (user_space->next != NULL)
-		user_space->next->prev = user_space->prev;
+	unlink_user_space(user_space);
 	// free user_space
 	munmap(user_space, sizeof(t_user_space));
 
 	if (block->user_space == NULL)
-		delete_block(&heap, block, type, page_size);
+		delete_block(heap, block);
 }
 
-void	delete_heap_large(t_heap_large *heap_large, size_t page_size)
+void	delete_large_heap(t_large_heap *large_heap)
 {
-	munmap(heap_large->start_user_space, heap_large->size_allocated);
-	munmap(heap_large, sizeof(t_heap_large) + page_size * LARGE);
-	heap_large = NULL;
+	
+	munmap(large_heap, large_heap->size_allocated);
+	large_heap = NULL;
 	if (data->large_heap == NULL)
 	{
-		munmap(data->large_heap, sizeof(t_heap_large));
+		munmap(data->large_heap, sizeof(t_large_heap));
 		data->large_heap = NULL;
 	}
 }

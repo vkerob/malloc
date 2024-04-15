@@ -25,22 +25,22 @@ static t_user_space	*find_in_heap(t_heap *heap, void *ptr)
 }
 
 // try to find the user_space in the heap large
-static t_heap_large	*find_in_heap_large(void *ptr)
+static t_large_heap	*find_in_large_heap(void *ptr)
 {
-	t_heap_large	*heap_large_tmp;
+	t_large_heap	*large_heap_tmp;
 	
-	heap_large_tmp = data->large_heap;
-	while (heap_large_tmp)
+	large_heap_tmp = data->large_heap;
+	while (large_heap_tmp)
 	{
-		if (heap_large_tmp->start_user_space == ptr)
-			return (heap_large_tmp);
-		heap_large_tmp = heap_large_tmp->next;
+		if (large_heap_tmp->start_user_space == ptr)
+			return (large_heap_tmp);
+		large_heap_tmp = large_heap_tmp->next;
 	}
 	return (NULL);
 }
 
 // find the user_space in the heap tiny, small or large
-void	find_ptr(t_user_space **user_space_tmp, t_heap_large **heap_large_tmp ,void *ptr, size_t *type)
+void	find_ptr(t_user_space **user_space_tmp, t_large_heap **large_heap_tmp ,void *ptr, size_t *type)
 {
 
 	*user_space_tmp = find_in_heap(data->tiny_heap, ptr);
@@ -55,8 +55,8 @@ void	find_ptr(t_user_space **user_space_tmp, t_heap_large **heap_large_tmp ,void
 		*type = SMALL;
 		return ;
 	}
-	*heap_large_tmp = find_in_heap_large(ptr);
-	if (*heap_large_tmp)
+	*large_heap_tmp = find_in_large_heap(ptr);
+	if (*large_heap_tmp)
 	{
 		*type = LARGE;
 		return ;

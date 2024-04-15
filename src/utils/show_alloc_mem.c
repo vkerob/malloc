@@ -61,9 +61,9 @@ static void	show_heap(t_heap *heap, size_t *total_size)
 	}
 }
 
-void	show_heap_large(size_t *total_size)
+void	show_large_heap(size_t *total_size)
 {
-	t_heap_large	*large_heap;
+	t_large_heap	*large_heap;
 
 	large_heap = data->large_heap;
 	while (large_heap)
@@ -76,15 +76,15 @@ void	show_heap_large(size_t *total_size)
 		ft_putstr_fd(" : ", 1);
 		ft_putnbr_base_fd(large_heap->size_allocated, "0123456789", 1);
 		ft_putstr_fd(" bytes\n", 1);
-		large_heap = large_heap->next;
 		*total_size += large_heap->size_allocated;
+		large_heap = large_heap->next;
 	}
 }
 
 void	show_alloc_mem()
 {
 	size_t			total_size = 0;
-	
+
 	if (data == NULL)
 		return ;
 	if (data->tiny_heap)
@@ -104,10 +104,9 @@ void	show_alloc_mem()
 	if (data->large_heap)
 	{
 		ft_putstr_fd("LARGE\n", 1);
-		show_heap_large(&total_size);
+		show_large_heap(&total_size);
 	}
 	ft_putstr_fd("Total : ", 1);
 	ft_putnbr_base_fd(total_size, "0123456789", 1);
 	ft_putstr_fd(" bytes\n", 1);
-
 }

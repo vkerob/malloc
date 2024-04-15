@@ -3,11 +3,9 @@
 
 void	*realloc(void *ptr, size_t size)
 {
-	size_t		page_size = getpagesize();
-
-	if (size <= page_size * SMALL)
+	if (size <= data->page_size * SMALL)
 	{
-		if (size <= page_size * TINY)
+		if (size <= data->page_size * TINY)
 		{
 			// find the area or allocate a new one
 			find_new_area_or_allocate(data->tiny_heap, size, TINY);
@@ -30,6 +28,7 @@ void	*realloc(void *ptr, size_t size)
 	}
 	if (data->error == false)
 		return (data->user_space_pointer);
+	// error detected, free all allocated memory
 	free_all();
 	return (NULL);
 }

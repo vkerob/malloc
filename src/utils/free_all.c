@@ -1,8 +1,8 @@
 #include "../../include/mem.h"
 
-void	free_free_area(t_free_space *free_area)
+void	free_free_area(t_free_area *free_area)
 {
-	t_free_space	*tmp;
+	t_free_area	*tmp;
 
 	while (free_area)
 	{
@@ -41,9 +41,9 @@ void	free_heap(t_heap *heap)
 	free(heap);
 }
 
-void	free_heap_large(t_heap_large *heap)
+void	free_large_heap(t_large_heap *heap)
 {
-	t_heap_large	*tmp;
+	t_large_heap	*tmp;
 
 	while (heap)
 	{
@@ -61,6 +61,6 @@ void	free_all(void)
 	if (data->small_heap)
 		free_heap(data->small_heap);
 	if (data->large_heap)
-		free_heap_large(data->large_heap);
+		free_large_heap(data->large_heap);
 	free(data);
 }
