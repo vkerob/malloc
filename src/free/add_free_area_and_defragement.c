@@ -13,6 +13,10 @@ void defragment(t_free_area *free_area, size_t heap_size)
 			free_area->start_free_area = prev->start_free_area;
 			free_area->ptr_defragment = prev->ptr_defragment;
 			free_area->prev = prev->prev;
+			if (prev->prev != NULL)
+				prev->prev->next = free_area;
+			else
+				free_area->parent_heap->free_area = free_area;
 			munmap(prev, sizeof(t_free_area));
 			defragment(free_area, heap_size);
 		}
@@ -39,10 +43,13 @@ static void link_after_current(t_free_area *free_area_current, t_free_area *free
 	free_area_add->next = free_area_current->next;
 	if (free_area_current->next != NULL)
 		free_area_current->next->prev = free_area_add;
-	if (free_area_current == NULL)
-		free_area_add->parent_heap->free_area = free_area_add;
+	free_area_add->prev = free_area_current;
+	if (free_area_current->prev != NULL)
+		free_area_current->prev->next = free_area_add;
 	else
-		free_area_add->prev = free_area_current;
+		free_area_add->parent_heap->free_area = free_area_add;
+	free_area_current->next = free_area_add;
+
 }
 
 static void link_before_current(t_free_area *free_area_current, t_free_area *free_area_add)
@@ -53,6 +60,7 @@ static void link_before_current(t_free_area *free_area_current, t_free_area *fre
 	else
 		free_area_add->parent_heap->free_area = free_area_add;
 	free_area_add->next = free_area_current;
+	free_area_current->prev = free_area_add;
 }
 
 static void initialize_new_free_area(t_user_space *user_space, t_free_area **free_area_add, t_free_area *free_area_current, bool add_after)

@@ -40,7 +40,7 @@ test: libft_malloc_$(HOSTTYPE).so
 	$(CC) $(CFLAGS) -L. -lft_malloc -o test src/main.c
 
 clean:
-	rm -f $(OBJ) libft_malloc_$(HOSTTYPE).so test 
+	rm -f $(OBJ) libft_malloc_$(HOSTTYPE).so test
 
 fclean: clean
 	rm -rf libft_malloc.so obj
