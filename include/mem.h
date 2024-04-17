@@ -93,6 +93,10 @@ void	find_ptr(t_user_space **user_space_tmp, t_large_heap **large_heap_tmp ,void
 // unlink functions
 void	unlink_large_heap(t_large_heap *large_heap);
 void	unlink_user_space(t_user_space *user_space);
+void	unlink_free_area(t_free_area *free_area);
+void	unlink_block(t_block *block);
+
+
 // link functions
 void	link_user_space(t_user_space *user_space, t_user_space *user_space_prev);
 void	link_large_heap(t_large_heap *new_large_heap, t_large_heap *large_heap_prev);

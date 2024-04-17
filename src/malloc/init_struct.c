@@ -46,7 +46,7 @@ static void	add_free_area(t_heap *heap, t_user_space *user_space, size_t size, s
 	free_area_tmp->next->free_size = data->page_size * type - size;
 	free_area_tmp->next->next = NULL;
 	free_area_tmp->next->prev = free_area_tmp;
-	free_area_tmp->parent_heap = user_space->parent_block->parent_heap;
+	free_area_tmp->next->parent_heap = user_space->parent_block->parent_heap;
 }
 
 //--------------------------------------------------------------------------------------------//
@@ -60,7 +60,7 @@ static void	initialize_user_space(t_heap *heap, t_block *block, size_t size, siz
 		data->error = true;
 		return ;
 	}
-	block->user_space->start_user_space = block->user_space + sizeof(t_block);
+	block->user_space->start_user_space = (void *)block + sizeof(t_block);
 	block->user_space->ptr_defragment = block->user_space->start_user_space;
 	block->user_space->size_allocated = size;
 	block->user_space->parent_block = block;
@@ -138,7 +138,7 @@ void	initialize_large_heap(t_large_heap **new_large_heap, t_large_heap *large_he
 		return ;
 	}
 	// initialize the new node large_heap
-	(*new_large_heap)->start_user_space = (*new_large_heap) + sizeof(t_large_heap);
+	(*new_large_heap)->start_user_space = (void *)(*new_large_heap) + sizeof(t_large_heap);
 	(*new_large_heap)->size_allocated = size;
 
 	// link the new node large_heap

@@ -10,8 +10,8 @@ static t_block	*find_new_user_space_parent_block(t_heap *heap, void *ptr)
 	block = heap->start_block;
 	while (block)
 	{
-		// check if the pointer is between the start and the end of the user space block
-		if (ptr >= (void *)block->user_space + sizeof(t_user_space) && ptr < (void *)block->user_space + heap->size)
+		// check if the pointer is between the start and the end of the block
+		if (ptr >= (void *)block && ptr <= (void *)block + sizeof(t_block) + heap->size)
 			return (block);
 		block = block->next;
 	}

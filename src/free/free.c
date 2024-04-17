@@ -2,12 +2,10 @@
 
 void	free(void *ptr)
 {
-	t_data *data2 = data;
-	(void)data2;
 	t_user_space	*user_space_target;
 	t_large_heap	*large_heap_target;
 	t_heap			**heap_tmp;
-	size_t			type;
+	size_t			type = 0;
 
 	find_ptr(&user_space_target, &large_heap_target, ptr, &type);
 	if (type == TINY || type == SMALL)
@@ -21,10 +19,15 @@ void	free(void *ptr)
 		}
 		delete_user_space_or_block(heap_tmp, user_space_target);
 	}
-	else
+	else if (type == LARGE)
 	{
 		unlink_large_heap(large_heap_target);
 		delete_large_heap(large_heap_target);
+	}
+	else
+	{
+		write(1, "Error: double free\n", 20);
+		return ;
 	}
 	if (data->tiny_heap == NULL && data->small_heap == NULL && data->large_heap == NULL)
 	{

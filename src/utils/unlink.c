@@ -10,7 +10,7 @@ void	unlink_large_heap(t_large_heap *large_heap)
 		large_heap->next->prev = large_heap->prev;
 }
 
-void	unlink_free_space(t_free_area *free_area)
+void	unlink_free_area(t_free_area *free_area)
 {
 	if (free_area->prev != NULL)
 		free_area->prev->next = free_area->next;

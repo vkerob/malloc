@@ -61,4 +61,6 @@ void	find_ptr(t_user_space **user_space_tmp, t_large_heap **large_heap_tmp ,void
 		*type = LARGE;
 		return ;
 	}
+	else
+		*type = 0;
 }
