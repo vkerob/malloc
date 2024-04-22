@@ -2,92 +2,78 @@
 
 //------------------------------------------------------------------set_user_space------------------------------------------------------------------//
 
-// find the parent block of a pointer for set parent_block in user_space and set user_space in block
-static t_block	*find_new_user_space_parent_block(t_heap *heap, void *ptr)
+static void set_used_user_space(t_user_space *unused_user_space, size_t size)
 {
-	t_block	*block;
+	t_user_space	*used_user_space = unused_user_space->parent_block->used_user_space;
+	t_user_space	*used_user_space_prev = NULL;
 
-	block = heap->start_block;
-	while (block)
+	// find last used_user_space
+	while (used_user_space)
 	{
-		// check if the pointer is between the start and the end of the block
-		if (ptr >= (void *)block && ptr <= (void *)block + sizeof(t_block) + heap->size)
-			return (block);
-		block = block->next;
-	}
-	return (NULL);
-}
-
-static void set_user_space(t_free_area *free_area, size_t size)
-{
-	t_user_space	*user_space = NULL;
-	t_user_space	*user_space_prev = NULL;
-
-	// send the new user_space to the parent block (free_area->start_free_area is the start of the user_space)
-	t_block	*block = find_new_user_space_parent_block(free_area->parent_heap, free_area->start_free_area);
-	if (block != NULL)
-		user_space = block->user_space;
-
-	// find last user_space
-	while (user_space)
-	{
-		if (user_space->next == NULL)
-			user_space_prev = user_space;
-		user_space = user_space->next;
+		if (used_user_space->next == NULL)
+			used_user_space_prev = used_user_space;
+		used_user_space = used_user_space->next;
 	}
 
-	// allocate and set user_space
-	user_space = mmap(NULL, sizeof(t_user_space), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	if (user_space == MAP_FAILED)
+	// allocate and set used_user_space
+	used_user_space = mmap(NULL, sizeof(t_user_space), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	if (used_user_space == MAP_FAILED)
 	{
 		data->error = true;
 		return ;
 	}
-	user_space->start_user_space = free_area->start_free_area;
-	user_space->ptr_defragment = free_area->start_free_area;
-	data->user_space_pointer = user_space->start_user_space;
-	user_space->size_allocated = size;
-	user_space->parent_block = block;
+	used_user_space->start_user_space = unused_user_space->start_user_space;
+	used_user_space->size_allocated = size;
+	used_user_space->parent_block = unused_user_space->parent_block;
 
-	// link user_space
-	link_user_space(user_space, user_space_prev);
+	data->user_space_pointer = used_user_space->start_user_space;
+	// link used_user_space
+	link_used_user_space(used_user_space, used_user_space_prev);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------//
 
-static void	set_user_space_and_reduce_free_area(t_free_area *free_area, size_t size)
+static void	set_used_user_space_and_reduce_free_area(t_user_space *unused_user_space, size_t size)
 {
 
-	// set user space
-	set_user_space(free_area, size);
+	// set used user space
+	set_used_user_space(unused_user_space, size);
 	if (data->error)
 		return ;
 
-	// reduce free area
-	free_area->free_size -= size;
-	if (free_area->free_size != 0)
-		free_area->start_free_area += size;
-	else
-		free_area->start_free_area = NULL;
-
+	// reduce unused user space
+	unused_user_space->start_user_space += size;
+	unused_user_space->size_allocated -= size;
+	if (unused_user_space->size_allocated == 0)
+	{
+		unlink_unused_user_space(unused_user_space);
+		munmap(unused_user_space, sizeof(t_user_space));
+		unused_user_space = NULL;
+	}
 }
 
-// search for a free space in the heap free_area
+// search for a unused user space
 bool	search_free_space(t_heap *heap, size_t size)
 {
-	t_free_area	*free_area;
+	t_block			*block;
+	t_user_space	*unused_user_space;
 
 	if (heap == NULL)
 		return (NULL);
-	free_area = heap->free_area;
-	while (free_area)
+	block = heap->start_block;
+	while (block)
 	{
-		if (free_area->free_size >= size)
+		unused_user_space = block->unused_user_space;
+		while (unused_user_space)
 		{
-			set_user_space_and_reduce_free_area(free_area, size);
-			return (true);
+			if (unused_user_space->size_allocated >= size)
+			{
+				set_used_user_space_and_reduce_free_area(unused_user_space, size);
+				return (true);
+			}
+			unused_user_space = unused_user_space->next;
 		}
-		free_area = free_area->next;
+		block = block->next;
 	}
 	return (false);
 }

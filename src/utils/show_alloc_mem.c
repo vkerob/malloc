@@ -43,7 +43,7 @@ static void	show_heap(t_heap *heap, size_t *total_size)
 	block = heap->start_block;
 	while (block)
 	{
-		user_space = block->user_space;
+		user_space = block->used_user_space;
 		while (user_space)
 		{
 			ft_putstr_fd("0x", 1);

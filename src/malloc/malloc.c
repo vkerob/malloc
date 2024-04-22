@@ -4,6 +4,8 @@ t_data	*data = NULL;
 
 void	*malloc(size_t size)
 {
+	t_heap	**heap_tmp;
+	int		type;
 
 	if (data == NULL)
 		initialize_data(&data);
@@ -11,12 +13,11 @@ void	*malloc(size_t size)
 	if (data == NULL)
 		return NULL;
 
-	if (size <= data->page_size * SMALL)
+	if (size <= data->page_size * SMALL || size <= data->page_size * TINY)
 	{
-		if (size <= data->page_size * TINY)
-			found_space_or_allocate(&(data->tiny_heap), size, TINY);
-		else
-			found_space_or_allocate(&(data->small_heap), size, SMALL);
+		heap_tmp = ((size <= data->page_size * SMALL) == (TINY * data->page_size)) ? &(data->tiny_heap) : &(data->small_heap);
+		type = ((size <= data->page_size * SMALL) == (TINY * data->page_size)) ? TINY : SMALL;
+		found_space_or_allocate(heap_tmp, size, type);
 	}
 	else
 		allocate_large(size);

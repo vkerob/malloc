@@ -1,17 +1,5 @@
 #include "../../include/mem.h"
 
-void	free_free_area(t_free_area *free_area)
-{
-	t_free_area	*tmp;
-
-	while (free_area)
-	{
-		tmp = free_area->next;
-		free(free_area);
-		free_area = tmp;
-	}
-}
-
 void	free_user_space(t_user_space *user_space)
 {
 	t_user_space	*tmp;
@@ -33,11 +21,11 @@ void	free_heap(t_heap *heap)
 	while (block)
 	{
 		tmp = block->next;
-		free_user_space(block->user_space);
+		free_user_space(block->used_user_space);
+		free_user_space(block->unused_user_space);
 		free(block);
 		block = tmp;
 	}
-	free_free_area(heap->free_area);
 	free(heap);
 }
 

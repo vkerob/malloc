@@ -1,12 +1,12 @@
 #include "../../include/mem.h"
 
-void	find_new_area_or_allocate(t_heap *heap, size_t size, size_t type)
+void	find_new_area_or_allocate(t_heap **heap, size_t size, size_t type)
 {
 	bool	space_found = false;
 
-	space_found = search_free_space(heap, size);
+	space_found = search_free_space(*heap, size);
 	if (space_found == false)
-		allocate(&heap, size, type);
+		allocate(heap, size, type);
 }
 
 //-------------------------------find_old_area_copy_and_free--------------------------------//
@@ -45,7 +45,7 @@ void	find_old_area_copy_and_free(void *ptr, size_t size)
 	t_large_heap	*large_heap_tmp;
 	size_t			type;
 
-	find_ptr(&user_space_tmp, &large_heap_tmp, ptr, &type);
+	find_used_user_space_ptr(&user_space_tmp, &large_heap_tmp, ptr, &type);
 	if (user_space_tmp)
 		copy_and_free(user_space_tmp, ptr, size);
 	else

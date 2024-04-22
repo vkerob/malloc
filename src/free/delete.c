@@ -2,25 +2,13 @@
 
 static void	delete_block_and_free_heap_if_Empty(t_heap **heap, t_block *block)
 {
-	t_free_area *free_area = (*heap)->free_area;
 
+	munmap(block->used_user_space, sizeof(t_user_space));
+	block->used_user_space = NULL;
+	munmap(block->unused_user_space, sizeof(t_user_space));
+	block->unused_user_space = NULL;
 	unlink_block(block);
 	munmap(block, sizeof(t_block) + (*heap)->size);
-	block = NULL;
-
-	// free a node of free_area if block is empty
-	while (free_area != NULL)
-	{
-		if (free_area->free_size == (*heap)->size)
-		{
-			//unlink free_area
-			unlink_free_area(free_area);
-			munmap(free_area, sizeof(t_free_area));
-			free_area = NULL;
-			break ;
-		}
-		free_area = free_area->next;
-	}
 
 	// free heap if not used
 	if ((*heap)->start_block == NULL)
@@ -30,21 +18,16 @@ static void	delete_block_and_free_heap_if_Empty(t_heap **heap, t_block *block)
 	}
 }
 
-void	delete_user_space_or_block(t_heap **heap, t_user_space *user_space)
+void	check_if_block_is_unused(t_heap **heap, t_block *parent_block_used_user_space)
 {
-	t_block *block = user_space->parent_block;
-		
-	unlink_user_space(user_space);
-	munmap(user_space, sizeof(t_user_space));
-	if (block->user_space == NULL)
-		delete_block_and_free_heap_if_Empty(heap, block);
+	if (parent_block_used_user_space->used_user_space == NULL)
+		delete_block_and_free_heap_if_Empty(heap, parent_block_used_user_space);
 }
 
-void	delete_large_heap(t_large_heap *large_heap)
+void	delete_large_heap(t_large_heap *large_heap_used)
 {
 	
-	munmap(large_heap, large_heap->size_allocated);
-	large_heap = NULL;
+	munmap(large_heap_used, large_heap_used->size_allocated);
 	if (data->large_heap == NULL)
 	{
 		munmap(data->large_heap, sizeof(t_large_heap));

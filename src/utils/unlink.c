@@ -10,16 +10,6 @@ void	unlink_large_heap(t_large_heap *large_heap)
 		large_heap->next->prev = large_heap->prev;
 }
 
-void	unlink_free_area(t_free_area *free_area)
-{
-	if (free_area->prev != NULL)
-		free_area->prev->next = free_area->next;
-	else
-		free_area->parent_heap->free_area = free_area->next;
-	if (free_area->next != NULL)
-		free_area->next->prev = free_area->prev;
-}
-
 void	unlink_block(t_block *block)
 {
 	if (block->prev != NULL)
@@ -30,12 +20,22 @@ void	unlink_block(t_block *block)
 		block->next->prev = block->prev;
 }
 
-void	unlink_user_space(t_user_space *user_space)
+void	unlink_used_user_space(t_user_space *used_user_space)
 {
-	if (user_space->prev != NULL)
-		user_space->prev->next = user_space->next;
+	if (used_user_space->prev != NULL)
+		used_user_space->prev->next = used_user_space->next;
 	else
-		user_space->parent_block->user_space = user_space->next;
-	if (user_space->next != NULL)
-		user_space->next->prev = user_space->prev;
+		used_user_space->parent_block->used_user_space = used_user_space->next;
+	if (used_user_space->next != NULL)
+		used_user_space->next->prev = used_user_space->prev;
+}
+
+void	unlink_unused_user_space(t_user_space *unused_user_space)
+{
+	if (unused_user_space->prev != NULL)
+		unused_user_space->prev->next = unused_user_space->next;
+	else
+		unused_user_space->parent_block->unused_user_space = unused_user_space->next;
+	if (unused_user_space->next != NULL)
+		unused_user_space->next->prev = unused_user_space->prev;
 }

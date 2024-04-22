@@ -3,22 +3,18 @@
 
 void	*realloc(void *ptr, size_t size)
 {
-	if (size <= data->page_size * SMALL)
+	t_heap	**heap_tmp;
+	int		type;
+
+	if (size <= data->page_size * SMALL || size <= data->page_size * TINY)
 	{
-		if (size <= data->page_size * TINY)
-		{
-			// find the area or allocate a new one
-			find_new_area_or_allocate(data->tiny_heap, size, TINY);
-			if (data->error == false)
-				// copy the old data to the new area and free the old area
-				find_old_area_copy_and_free(ptr, size);
-		}
-		else
-		{
-			find_new_area_or_allocate(data->small_heap, size, SMALL);
-			if (data->error == false)
-				find_old_area_copy_and_free(ptr, size);
-		}
+		heap_tmp = ((size <= data->page_size * SMALL) == (TINY * data->page_size)) ? &(data->tiny_heap) : &(data->small_heap);
+		type = ((size <= data->page_size * SMALL) == (TINY * data->page_size)) ? TINY : SMALL;
+		// find the area or allocate a new one
+		find_new_area_or_allocate(heap_tmp, size, type);
+		if (data->error == false)
+			// copy the old data to the new area and free the old area
+			find_old_area_copy_and_free(ptr, size);
 	}
 	else
 	{

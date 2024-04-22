@@ -10,7 +10,7 @@ SRC=	src/main.c \
 		src/realloc/find_old_area_copy_and_free.c \
 		src/free/free.c \
 		src/free/delete.c \
-		src/free/add_free_area_and_defragement.c \
+		src/free/link_new_unused_user_space_and_defragment.c \
 		src/utils/show_alloc_mem.c \
 		src/utils/find_ptr.c \
 		src/utils/search_free_space.c \
@@ -36,8 +36,8 @@ $(OBJ_DIR)/%.o: %.c
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-test: libft_malloc_$(HOSTTYPE).so
-	$(CC) $(CFLAGS) -L. -lft_malloc -o test src/main.c
+test: $(OBJ)
+	$(CC) $(CFLAGS) -o test src/main.c $(OBJ)
 
 clean:
 	rm -f $(OBJ) libft_malloc_$(HOSTTYPE).so test

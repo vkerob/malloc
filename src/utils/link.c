@@ -15,12 +15,22 @@ void	link_large_heap(t_large_heap *new_large_heap, t_large_heap *large_heap_prev
 	}
 }
 
-void	link_user_space(t_user_space *user_space, t_user_space *user_space_prev)
+void	link_used_user_space(t_user_space *user_space, t_user_space *user_space_prev)
 {
 	user_space->next = NULL;
 	user_space->prev = user_space_prev;
 	if (user_space_prev)
 		user_space_prev->next = user_space;
 	else
-		user_space->parent_block->user_space = user_space;
+		user_space->parent_block->used_user_space = user_space;
+}
+
+void	link_unused_user_space(t_user_space *user_space, t_user_space *user_space_prev)
+{
+	user_space->next = NULL;
+	user_space->prev = user_space_prev;
+	if (user_space_prev)
+		user_space_prev->next = user_space;
+	else
+		user_space->parent_block->unused_user_space = user_space;
 }
