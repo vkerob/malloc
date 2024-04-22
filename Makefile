@@ -2,8 +2,7 @@ CC=gcc
 
 CFLAGS= -Wall -Wextra -Werror -fPIC -g
 
-SRC=	src/main.c \
-		src/malloc/malloc.c \
+SRC=	src/malloc/malloc.c \
 		src/malloc/init_struct.c \
         src/malloc/allocate.c \
 		src/realloc/realloc.c \
@@ -12,7 +11,7 @@ SRC=	src/main.c \
 		src/free/delete.c \
 		src/free/link_new_unused_user_space_and_defragment.c \
 		src/utils/show_alloc_mem.c \
-		src/utils/find_ptr.c \
+		src/utils/find_used_user_space_ptr.c \
 		src/utils/search_free_space.c \
 		src/utils/free_all.c \
 		src/utils/link.c \
@@ -21,6 +20,8 @@ SRC=	src/main.c \
 
 OBJ_DIR = obj
 OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
+SRC_TEST= $(SRC) src/main.c
+OBJ_TEST = $(addprefix $(OBJ_DIR)/, $(SRC_TEST:.c=.o))
 
 ifeq ($(HOSTTYPE),)
 	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
@@ -36,15 +37,17 @@ $(OBJ_DIR)/%.o: %.c
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-test: $(OBJ)
-	$(CC) $(CFLAGS) -o test src/main.c $(OBJ)
+test: $(OBJ_TEST)
+	$(CC) $(CFLAGS) -o test $(OBJ_TEST)
 
 clean:
-	rm -f $(OBJ) libft_malloc_$(HOSTTYPE).so test
+	rm -f $(OBJ) $(OBJ_TEST) libft_malloc_$(HOSTTYPE).so test
 
 fclean: clean
 	rm -rf libft_malloc.so obj
 
 re: fclean all
+
+.PHONY: all clean fclean re test
 
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
