@@ -46,13 +46,13 @@ void	find_used_user_space_ptr(t_user_space **user_space_tmp, t_large_heap **larg
 	*user_space_tmp = find_in_heap(data->tiny_heap, ptr);
 	if (*user_space_tmp)
 	{
-		*type = TINY;
+		*type = TINY_SIZE;
 		return ;
 	}
 	*user_space_tmp = find_in_heap(data->small_heap, ptr);
 	if (*user_space_tmp)
 	{
-		*type = SMALL;
+		*type = SMALL_SIZE;
 		return ;
 	}
 	*large_heap_tmp = find_in_large_heap(ptr);

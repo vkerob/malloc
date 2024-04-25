@@ -1,17 +1,5 @@
 #include "../../include/mem.h"
 
-void	free_user_space(t_user_space *user_space)
-{
-	t_user_space	*tmp;
-
-	while (user_space)
-	{
-		tmp = user_space->next;
-		free(user_space);
-		user_space = tmp;
-	}
-}
-
 void	free_heap(t_heap *heap)
 {
 	t_block	*block;
@@ -21,8 +9,6 @@ void	free_heap(t_heap *heap)
 	while (block)
 	{
 		tmp = block->next;
-		free_user_space(block->used_user_space);
-		free_user_space(block->unused_user_space);
 		free(block);
 		block = tmp;
 	}
@@ -51,4 +37,5 @@ void	free_all(void)
 	if (data->large_heap)
 		free_large_heap(data->large_heap);
 	free(data);
+	pthread_mutex_unlock(&lock);
 }

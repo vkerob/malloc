@@ -98,12 +98,20 @@ void	show_alloc_mem()
 	}
 	if (data->small_heap)
 	{
-		ft_putstr_fd("SMALL\n", 1);
+		ft_putstr_fd("SMALL", 1);
+		ft_putstr_fd(" : ", 1);
+		ft_putstr_fd("0x", 1);
+		ft_putnbr_base_fd((unsigned long)(data->small_heap->start_block), "0123456789ABCDEF", 1);
+		ft_putstr_fd("\n", 1);
 		show_heap(data->small_heap, &total_size);
 	}
 	if (data->large_heap)
 	{
-		ft_putstr_fd("LARGE\n", 1);
+		ft_putstr_fd("LARGE", 1);
+		ft_putstr_fd(" : ", 1);
+		ft_putstr_fd("0x", 1);
+		ft_putnbr_base_fd((unsigned long)(data->large_heap), "0123456789ABCDEF", 1);
+		ft_putstr_fd("\n", 1);
 		show_large_heap(&total_size);
 	}
 	ft_putstr_fd("Total : ", 1);

@@ -7,31 +7,27 @@ static void defragment(t_user_space *new_unused_user_space)
 
 	if (prev != NULL)
 	{
-		if (prev->start_user_space + prev->size_allocated == new_unused_user_space->start_user_space)
+		if (prev->parent_block == new_unused_user_space->parent_block)
 		{
 			prev->size_allocated += new_unused_user_space->size_allocated;
 			prev->next = next;
 			if (next != NULL)
 				next->prev = prev;
-			munmap(new_unused_user_space, sizeof(t_user_space));
 			defragment(prev);
 		}
 	}
 	if (next != NULL && new_unused_user_space != NULL)
 	{
-		if (new_unused_user_space->start_user_space + new_unused_user_space->size_allocated == next->start_user_space)
+		if (new_unused_user_space->parent_block == next->parent_block)
 		{
 			new_unused_user_space->size_allocated += next->size_allocated;
 			new_unused_user_space->next = next->next;
 			if (next->next != NULL)
 				next->next->prev = new_unused_user_space;
-			munmap(next, sizeof(t_user_space));
 			defragment(new_unused_user_space);
 		}
 	}
 }
-
-//---------------------------------------------------------------add_free_area utils---------------------------------------------------------------//
 
 static void link_after_current(t_user_space *used_user_space, t_user_space *current_unused_user_space)
 {
@@ -62,9 +58,6 @@ static void link_before_current(t_user_space *used_user_space, t_user_space *cur
 		used_user_space->parent_block->unused_user_space = used_user_space;
 	current_unused_user_space->prev = used_user_space;
 }
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------//
-
 
 void link_new_unused_user_space_and_defragment(t_user_space *used_user_space)
 {

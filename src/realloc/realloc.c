@@ -6,13 +6,17 @@ void	*realloc(void *ptr, size_t size)
 	t_heap	**heap_tmp;
 	int		type;
 
-	if (size <= data->page_size * SMALL || size <= data->page_size * TINY)
+	pthread_mutex_lock(&lock);
+	data->user_space_pointer = NULL;
+	if (size <= TINY_MAX_SIZE_ALLOC || size <= SMALL_MAX_SIZE_ALLOC)
 	{
-		heap_tmp = ((size <= data->page_size * SMALL) == (TINY * data->page_size)) ? &(data->tiny_heap) : &(data->small_heap);
-		type = ((size <= data->page_size * SMALL) == (TINY * data->page_size)) ? TINY : SMALL;
+		heap_tmp = (size <= TINY_MAX_SIZE_ALLOC) ? &(data->tiny_heap) : &(data->small_heap);
+		type = (size <= TINY_MAX_SIZE_ALLOC) ? TINY_MAX_SIZE_ALLOC : SMALL_MAX_SIZE_ALLOC;
+
 		// find the area or allocate a new one
 		find_new_area_or_allocate(heap_tmp, size, type);
 		if (data->error == false)
+
 			// copy the old data to the new area and free the old area
 			find_old_area_copy_and_free(ptr, size);
 	}
@@ -23,7 +27,11 @@ void	*realloc(void *ptr, size_t size)
 			find_old_area_copy_and_free(ptr, size);
 	}
 	if (data->error == false)
+	{
+		pthread_mutex_unlock(&lock);
 		return (data->user_space_pointer);
+	}
+
 	// error detected, free all allocated memory
 	free_all();
 	return (NULL);

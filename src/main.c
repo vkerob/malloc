@@ -255,7 +255,7 @@ bool	test_large4(int show)
 
 void	test_tiny()
 {
-	if (test_tiny1(0) == false)
+	if (test_tiny1(1) == false)
 		write(1, "test_tiny1 failed\n", 19);
 	if (test_tiny2(0) == false)
 		write(1, "test_tiny2 failed\n", 19);
