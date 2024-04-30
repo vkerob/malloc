@@ -33,9 +33,9 @@ static void	initialize_unused_user_space(t_block *block, size_t size, size_t typ
 {
 	t_user_space	*prev_unused_user_space;
 
-	block->unused_user_space = align_address((t_user_space *)((void *)block + sizeof(t_block) + sizeof(t_user_space) + size));
-	block->unused_user_space->start_user_space = align_address((void *)block->unused_user_space + sizeof(t_user_space));
-	block->unused_user_space->size_allocated = (size_t)(type_size) - (size + sizeof(t_block) + sizeof(t_user_space) * 2);
+	block->unused_user_space = (void *)block + ALLIGN_BLOCK;	// without aligning the address this looks like this: block->unused_user_space = (void *)block + sizeof(t_block);
+	block->unused_user_space->start_user_space = align_address((void *)block->unused_user_space + ALLIGN_USER_SPACE * 2 + size);
+	block->unused_user_space->size_allocated = (size_t)(type_size) - ALLIGN_BLOCK - 2 * ALLIGN_USER_SPACE - (align_address((void *)block->unused_user_space + ALLIGN_USER_SPACE * 2 + size) - (void *)block->unused_user_space + ALLIGN_USER_SPACE * 2 + size);
 	block->unused_user_space->parent_block = block;
 
 	// link the unused_user_space
@@ -60,8 +60,8 @@ static void	initialize_unused_user_space(t_block *block, size_t size, size_t typ
 static void	initialize_used_user_space(t_block *block, size_t size)
 {
 	// add new used_user_space
-	block->used_user_space = align_address((t_user_space *)((void *)block + sizeof(t_block)));
-	block->used_user_space->start_user_space = align_address((void *)block->used_user_space + sizeof(t_user_space));
+	block->used_user_space = (void *)block + ALLIGN_BLOCK + ALLIGN_USER_SPACE;
+	block->used_user_space->start_user_space = (void *)block->used_user_space + ALLIGN_USER_SPACE;
 	block->used_user_space->size_allocated = size;
 	block->used_user_space->parent_block = block;
 	block->used_user_space->next = NULL;
@@ -142,14 +142,14 @@ void	initialize_large_heap(t_large_heap **new_large_heap, t_large_heap *large_he
 		data->error = true;
 		return ;
 	}
-	(*new_large_heap) = mmap(NULL, sizeof(t_large_heap) + size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+	(*new_large_heap) = mmap(NULL, ALLIGN_LARGE_HEAP + size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 	if (*new_large_heap == MAP_FAILED)
 	{
 		data->error = true;
 		return ;
 	}
 	// initialize the new node large_heap
-	(*new_large_heap)->start_user_space = (void *)(*new_large_heap) + sizeof(t_large_heap);
+	(*new_large_heap)->start_user_space = (void *)(*new_large_heap) + ALLIGN_LARGE_HEAP;
 	(*new_large_heap)->size_allocated = size;
 
 	// link the new node large_heap

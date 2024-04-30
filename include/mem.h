@@ -9,7 +9,7 @@
 #include <pthread.h>
 #include <sys/resource.h>
 #include <stdint.h>
-
+#include "../libft/libft.h"
 
 #define PAGE_SIZE getpagesize()
 #define TINY_SIZE (size_t)(PAGE_SIZE * 4)					// 16384 bytes
@@ -17,6 +17,10 @@
 #define SMALL_SIZE (size_t)(PAGE_SIZE * 64)				// 262144 bytes
 #define SMALL_MAX_SIZE_ALLOC (size_t)(SMALL_SIZE / 128)	// 2048 bytes
 #define MEN_ALLIGN 16
+#define ALLIGN_BLOCK (size_t)align_address((void *)sizeof(t_block))
+#define ALLIGN_USER_SPACE (size_t)align_address((void *)sizeof(t_user_space))
+#define ALLIGN_LARGE_HEAP (size_t)align_address((void *)sizeof(t_large_heap))
+
 #define LARGE 1
 
 extern pthread_mutex_t lock;

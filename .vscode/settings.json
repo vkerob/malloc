@@ -1,5 +1,6 @@
 {
 	"files.associations": {
+		"shema memoire tmp": "code-referencing",
 		"mem.h": "c",
 		"mman.h": "c",
 		"stddef.h": "c",
@@ -17,6 +18,8 @@
 		"unistd.h": "c",
 		"stdbool.h": "c",
 		"stdio.h": "c",
-		"stdint.h": "c"
+		"stdint.h": "c",
+		"libft.h": "c",
+		"pthread.h": "c"
 	}
 }

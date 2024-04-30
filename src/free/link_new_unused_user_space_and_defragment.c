@@ -7,7 +7,7 @@ static void defragment(t_user_space *new_unused_user_space)
 
 	if (prev != NULL)
 	{
-		if (prev->parent_block == new_unused_user_space->parent_block)
+		if (prev->start_user_space + (size_t)align_address(prev->start_user_space + prev->size_allocated) == new_unused_user_space->start_user_space)
 		{
 			prev->size_allocated += new_unused_user_space->size_allocated;
 			prev->next = next;
@@ -18,7 +18,7 @@ static void defragment(t_user_space *new_unused_user_space)
 	}
 	if (next != NULL && new_unused_user_space != NULL)
 	{
-		if (new_unused_user_space->parent_block == next->parent_block)
+		if (new_unused_user_space->start_user_space + (size_t)align_address(new_unused_user_space->start_user_space + new_unused_user_space->size_allocated) == next->start_user_space)
 		{
 			new_unused_user_space->size_allocated += next->size_allocated;
 			new_unused_user_space->next = next->next;

@@ -1,0 +1,31 @@
+
+INITIALISATION:
++----------------+------------------+-------------------+
+|     block      | unused_user_space  | used_user_space |
++----------------+------------------+-------------------+
+^                ^                  ^ 
+|                |                  |
+Début de la      Début de           Début de 
+mémoire allouée  used_user_space    unused_user_space
+par mmap
+
+AJOUT D'UN BLOC:
++----------------+------------------+------------------+-------------------+
+|     block      | used_user_space1 | used_user_space2 | unused_user_space |
++----------------+------------------+------------------+-------------------+
+
+
+BLOC DEVIENT INUTILISÉ:
++----------------+------------------+--------------------+--------------------+
+|     block      | used_user_space  | unused_user_space2 | unused_user_space1 |
++----------------+------------------+--------------------+--------------------+
+									^
+									|
+									devient unused_user_space
+
+
+COMBINAISON DE BLOCS INUTILISÉS:
++----------------+------------------+-------------------+
+|     block      | used_user_space  | unused_user_space |
++----------------+------------------+-------------------+
+

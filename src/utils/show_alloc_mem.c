@@ -1,24 +1,5 @@
 #include "../../include/mem.h"
 
-static void	ft_putstr_fd(char *s, int fd)
-{
-	int	i;
-
-	if (!s)
-		return ;
-	i = 0;
-	while (s[i])
-	{
-		write(fd, &s[i], 1);
-		i++;
-	}
-}
-
-static void	ft_putchar_fd(char c, int fd)
-{
-	write(fd, &c, 1);
-}
-
 static void	ft_putnbr_base_fd(unsigned long nbr, char *base, int fd)
 {
 	unsigned long	len_base;
@@ -50,7 +31,7 @@ static void	show_heap(t_heap *heap, size_t *total_size)
 			ft_putnbr_base_fd((unsigned long)(user_space->start_user_space), "0123456789ABCDEF", 1);
 			ft_putstr_fd(" - ", 1);
 			ft_putstr_fd("0x", 1);
-			ft_putnbr_base_fd((unsigned long)(user_space->start_user_space + user_space->size_allocated), "0123456789ABCDEF", 1);
+			ft_putnbr_base_fd((unsigned long)(user_space->start_user_space + (size_t)align_address((void *)user_space->start_user_space + user_space->size_allocated)), "0123456789ABCDEF", 1);
 			ft_putstr_fd(" : ", 1);
 			ft_putnbr_base_fd(user_space->size_allocated, "0123456789", 1);
 			ft_putstr_fd(" bytes\n", 1);

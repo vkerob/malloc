@@ -2,6 +2,9 @@ CC=gcc
 
 CFLAGS= -Wall -Wextra -Werror -fPIC -g
 
+LIBFT_DIR=./libft
+LIBFT= $(LIBFT_DIR)/libft.a
+
 SRC=	src/malloc/malloc.c \
 		src/malloc/init_struct.c \
         src/malloc/allocate.c \
@@ -27,8 +30,11 @@ ifeq ($(HOSTTYPE),)
 	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
 
-all: libft_malloc_$(HOSTTYPE).so
+all: $(LIBFT) libft_malloc_$(HOSTTYPE).so
 	ln -sf libft_malloc_$(HOSTTYPE).so libft_malloc.so
+
+$(LIBFT):
+	make -C $(LIBFT_DIR)
 
 libft_malloc_$(HOSTTYPE).so: $(OBJ)
 	$(CC) $(CFLAGS) -shared -o $@ $(OBJ)
@@ -38,16 +44,16 @@ $(OBJ_DIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 test: $(OBJ_TEST)
-	$(CC) $(CFLAGS) -o test $(OBJ_TEST)
+	$(CC) $(CFLAGS) -o test $(OBJ_TEST) -L$(LIBFT_DIR) -lft
 
 clean:
 	rm -f $(OBJ) $(OBJ_TEST) libft_malloc_$(HOSTTYPE).so test
+	make -C $(LIBFT_DIR) clean
 
 fclean: clean
 	rm -rf libft_malloc.so obj
+	make -C $(LIBFT_DIR) fclean
 
 re: fclean all
 
 .PHONY: all clean fclean re test
-
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
