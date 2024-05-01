@@ -29,13 +29,3 @@ void	unlink_used_user_space(t_user_space *used_user_space)
 	if (used_user_space->next != NULL)
 		used_user_space->next->prev = used_user_space->prev;
 }
-
-void	unlink_unused_user_space(t_user_space *unused_user_space)
-{
-	if (unused_user_space->prev != NULL)
-		unused_user_space->prev->next = unused_user_space->next;
-	else
-		unused_user_space->parent_block->unused_user_space = unused_user_space->next;
-	if (unused_user_space->next != NULL)
-		unused_user_space->next->prev = unused_user_space->prev;
-}

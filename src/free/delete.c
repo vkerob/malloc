@@ -4,7 +4,6 @@ static void	delete_block_and_free_heap_if_Empty(t_heap **heap, t_block *block)
 {
 
 	block->used_user_space = NULL;
-	block->unused_user_space = NULL;
 	unlink_block(block);
 	munmap(block, (*heap)->size);
 

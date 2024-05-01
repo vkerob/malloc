@@ -54,9 +54,10 @@ typedef struct heap
 
 typedef struct block
 {
-	struct user_space	*unused_user_space;
 	struct user_space	*used_user_space;
 	struct heap			*parent_heap;
+	size_t				free_size;
+	size_t				size_after;
 	struct block		*next;
 	struct block		*prev;
 	
@@ -65,6 +66,7 @@ typedef struct block
 typedef struct user_space
 {
 	void				*start_user_space;
+	size_t				size_after;
 	size_t				size_allocated;
 	struct block		*parent_block;
 	struct user_space	*next;
@@ -96,12 +98,10 @@ void	find_used_user_space_ptr(t_user_space **user_space_tmp, t_large_heap **larg
 // unlink functions
 void	unlink_large_heap(t_large_heap *large_heap);
 void	unlink_used_user_space(t_user_space *used_user_space);
-void	unlink_unused_user_space(t_user_space *unused_user_space);
 void	unlink_block(t_block *block);
 
 // link functions
 void	link_used_user_space(t_user_space *user_space, t_user_space *user_space_prev);
-void	link_unused_user_space(t_user_space *user_space, t_user_space *user_space_prev);
 void	link_large_heap(t_large_heap *new_large_heap, t_large_heap *large_heap_prev);
 
 // realloc utils functions

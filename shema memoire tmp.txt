@@ -29,3 +29,9 @@ COMBINAISON DE BLOCS INUTILISÉS:
 |     block      | used_user_space  | unused_user_space |
 +----------------+------------------+-------------------+
 
+
+
+prev = 140737353834544
+prev->start_user_space = 140737353834784
+new_unused_user_space = 140737353834656
+new_unused_user_space->start_user_space = 140737353836576

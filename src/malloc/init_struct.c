@@ -29,44 +29,18 @@ void	initialize_data(t_data **data)
 	(*data)->rlimit = rlimit;
 }
 
-static void	initialize_unused_user_space(t_block *block, size_t size, size_t type_size)
-{
-	t_user_space	*prev_unused_user_space;
-
-	block->unused_user_space = (void *)block + ALLIGN_BLOCK;	// without aligning the address this looks like this: block->unused_user_space = (void *)block + sizeof(t_block);
-	block->unused_user_space->start_user_space = align_address((void *)block->unused_user_space + ALLIGN_USER_SPACE * 2 + size);
-	block->unused_user_space->size_allocated = (size_t)(type_size) - ALLIGN_BLOCK - 2 * ALLIGN_USER_SPACE - (align_address((void *)block->unused_user_space + ALLIGN_USER_SPACE * 2 + size) - (void *)block->unused_user_space + ALLIGN_USER_SPACE * 2 + size);
-	block->unused_user_space->parent_block = block;
-
-	// link the unused_user_space
-	block->unused_user_space->next = NULL;
-	if (block->prev != NULL)
-	{
-		prev_unused_user_space = block->prev->unused_user_space;
-		if (prev_unused_user_space == NULL)
-		{
-			block->unused_user_space->prev = NULL;
-			return ;
-		}
-		while (prev_unused_user_space->next)
-			prev_unused_user_space = prev_unused_user_space->next;
-		block->unused_user_space->prev = prev_unused_user_space;
-		prev_unused_user_space->next = block->unused_user_space;
-	}
-	else
-		block->unused_user_space->prev = NULL;
-}
-
 static void	initialize_used_user_space(t_block *block, size_t size)
 {
 	// add new used_user_space
-	block->used_user_space = (void *)block + ALLIGN_BLOCK + ALLIGN_USER_SPACE;
+	block->used_user_space = (void *)block + ALLIGN_BLOCK;
 	block->used_user_space->start_user_space = (void *)block->used_user_space + ALLIGN_USER_SPACE;
 	block->used_user_space->size_allocated = size;
 	block->used_user_space->parent_block = block;
 	block->used_user_space->next = NULL;
 	block->used_user_space->prev = NULL;
 
+	block->free_size = block->free_size - size - ALLIGN_USER_SPACE;
+	block->used_user_space->size_after = block->free_size;
 	data->user_space_pointer = block->used_user_space->start_user_space;
 }
 
@@ -113,8 +87,9 @@ void	initialize_block(t_heap *heap, size_t size, size_t type_size)
 
 	// initialize the block
 	block->parent_heap = heap;
+	block->free_size = type_size - ALLIGN_BLOCK;
+	block->size_after = 0;
 	initialize_used_user_space(block, size);
-	initialize_unused_user_space(block, size, type_size);
 }
 
 void	initialize_heap(t_heap **heap, size_t type_size)
