@@ -21,7 +21,6 @@ static t_user_space	*find_in_heap(t_heap *heap, void *ptr)
 		block_tmp = block_tmp->next;
 	}
 	return (NULL);
-
 }
 
 // try to find the used_user_space in the heap large

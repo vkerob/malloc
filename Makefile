@@ -1,6 +1,6 @@
-CC=gcc
+CC=gcc -Wpadded
 
-CFLAGS= -Wall -Wextra -Werror -fPIC -g
+CFLAGS= -Wall -Wextra -fPIC -g
 
 LIBFT_DIR=./libft
 LIBFT= $(LIBFT_DIR)/libft.a
@@ -12,7 +12,7 @@ SRC=	src/malloc/malloc.c \
 		src/realloc/find_old_area_copy_and_free.c \
 		src/free/free.c \
 		src/free/delete.c \
-		src/free/link_new_unused_user_space_and_defragment.c \
+		src/free/defragment.c \
 		src/utils/show_alloc_mem.c \
 		src/utils/find_used_user_space_ptr.c \
 		src/utils/search_free_space.c \

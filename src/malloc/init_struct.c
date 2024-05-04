@@ -25,8 +25,8 @@ void	initialize_data(t_data **data)
 	(*data)->small_heap = NULL;
 	(*data)->large_heap = NULL;
 	(*data)->error = false;
-	(*data)->user_space_pointer = NULL;
 	(*data)->rlimit = rlimit;
+	(*data)->user_space_pointer = NULL;
 }
 
 static void	initialize_used_user_space(t_block *block, size_t size)

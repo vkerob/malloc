@@ -4,8 +4,7 @@ void	free(void *ptr)
 {
 	t_user_space	*used_user_space;
 	t_large_heap	*used_large_heap;
-	t_heap			**heap_tmp; 		// we change the pointer of used_user_space so we need a tmp
-	t_block			*block_tmp;			// same as above
+	t_heap			**heap_tmp;
 	size_t			type = 0;
 
 	pthread_mutex_lock(&lock);
@@ -19,10 +18,9 @@ void	free(void *ptr)
 	if (type == TINY_SIZE || type == SMALL_SIZE)
 	{
 		heap_tmp = (type == TINY_SIZE) ? &(data->tiny_heap) : &(data->small_heap);
+		defragment(used_user_space);
 		unlink_used_user_space(used_user_space);
-		block_tmp = used_user_space->parent_block;
-		link_new_unused_user_space_and_defragment(used_user_space);
-		check_if_block_is_unused(heap_tmp, block_tmp);
+		check_if_block_is_unused(heap_tmp, (&used_user_space->parent_block));
 	}
 	else if (type == LARGE)
 	{
@@ -45,4 +43,3 @@ void	free(void *ptr)
 	else
 		pthread_mutex_unlock(&lock);
 }
-

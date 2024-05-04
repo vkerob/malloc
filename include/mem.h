@@ -12,65 +12,69 @@
 #include "../libft/libft.h"
 
 #define PAGE_SIZE getpagesize()
+
 #define TINY_SIZE (size_t)(PAGE_SIZE * 4)					// 16384 bytes
+#define SMALL_SIZE (size_t)(PAGE_SIZE * 64)					// 262144 bytes
+#define LARGE 1
+
 #define TINY_MAX_SIZE_ALLOC (size_t)(TINY_SIZE / 128)		// 128 bytes
-#define SMALL_SIZE (size_t)(PAGE_SIZE * 64)				// 262144 bytes
-#define SMALL_MAX_SIZE_ALLOC (size_t)(SMALL_SIZE / 128)	// 2048 bytes
+#define SMALL_MAX_SIZE_ALLOC (size_t)(SMALL_SIZE / 128)		// 2048 bytes
+
 #define MEN_ALLIGN 16
 #define ALLIGN_BLOCK (size_t)align_address((void *)sizeof(t_block))
 #define ALLIGN_USER_SPACE (size_t)align_address((void *)sizeof(t_user_space))
 #define ALLIGN_LARGE_HEAP (size_t)align_address((void *)sizeof(t_large_heap))
 
-#define LARGE 1
 
 extern pthread_mutex_t lock;
 
 
-typedef struct	data
+typedef struct	data // 56 bytes
 {
 	struct heap			*tiny_heap;
 	struct heap			*small_heap;
 	struct large_heap	*large_heap;
 	struct rlimit		rlimit;
-	bool				error;
 	void				*user_space_pointer;
+	bool				error;
+	//char				padding[7];	  gcc do this padding
 }				t_data;
 
 extern t_data *data;
 
-typedef struct large_heap
+typedef struct large_heap // 32 bytes
 {
-	void				*start_user_space;
-	size_t				size_allocated;
 	struct large_heap	*next;
 	struct large_heap	*prev;
+	void				*start_user_space;
+	size_t				size_allocated;
 }				t_large_heap;
 
-typedef struct heap
+typedef struct heap // 16 bytes
 {
-	size_t				size;
 	struct block		*start_block;
+	size_t				size;
 }				t_heap;
 
-typedef struct block
+typedef struct block // 48 bytes
 {
+	struct block		*next;
+	struct block		*prev;
 	struct user_space	*used_user_space;
 	struct heap			*parent_heap;
 	size_t				free_size;
 	size_t				size_after;
-	struct block		*next;
-	struct block		*prev;
 	
 }				t_block;
 
-typedef struct user_space
+typedef struct user_space // 48 bytes
 {
+	struct user_space	*next;
+	struct user_space	*prev;
+	struct block		*parent_block;
 	void				*start_user_space;
 	size_t				size_after;
 	size_t				size_allocated;
-	struct block		*parent_block;
-	struct user_space	*next;
-	struct user_space	*prev;
 }				t_user_space;
 
 
@@ -106,14 +110,13 @@ void	link_large_heap(t_large_heap *new_large_heap, t_large_heap *large_heap_prev
 
 // realloc utils functions
 void	find_old_area_copy_and_free(void *ptr, size_t size);
-void	find_new_area_or_allocate(t_heap **heap, size_t size, size_t type);
 
 // free utils functions
 // delete functions
-void	check_if_block_is_unused(t_heap **heap, t_block *parent_block_used_user_space);
+void	check_if_block_is_unused(t_heap **heap, t_block **parent_block_used_user_space);
 void	delete_large_heap(t_large_heap *large_heap);
 // add functions
-void	link_new_unused_user_space_and_defragment(t_user_space *used_user_space);
+void	defragment(t_user_space *used_user_space);
 
 // free functions
 void	free_all(void);

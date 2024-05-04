@@ -1,24 +1,17 @@
 #include "../../include/mem.h"
 
-static void	delete_block_and_free_heap_if_Empty(t_heap **heap, t_block *block)
+void	check_if_block_is_unused(t_heap **heap, t_block **parent_block_used_user_space)
 {
-
-	block->used_user_space = NULL;
-	unlink_block(block);
-	munmap(block, (*heap)->size);
-
-	// free heap if not used
+	if ((*parent_block_used_user_space)->used_user_space == NULL)
+	{
+		unlink_block((*parent_block_used_user_space));
+		munmap((*parent_block_used_user_space), (*heap)->size);
+	}
 	if ((*heap)->start_block == NULL)
 	{
 		munmap((*heap), sizeof(t_heap));
 		(*heap) = NULL;
 	}
-}
-
-void	check_if_block_is_unused(t_heap **heap, t_block *parent_block_used_user_space)
-{
-	if (parent_block_used_user_space->used_user_space == NULL)
-		delete_block_and_free_heap_if_Empty(heap, parent_block_used_user_space);
 }
 
 void	delete_large_heap(t_large_heap *large_heap_used)

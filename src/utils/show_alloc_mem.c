@@ -68,6 +68,7 @@ void	show_alloc_mem()
 
 	if (data == NULL)
 		return ;
+	pthread_mutex_lock(&lock);
 	if (data->tiny_heap)
 	{
 		ft_putstr_fd("TINY", 1);
@@ -98,4 +99,5 @@ void	show_alloc_mem()
 	ft_putstr_fd("Total : ", 1);
 	ft_putnbr_base_fd(total_size, "0123456789", 1);
 	ft_putstr_fd(" bytes\n", 1);
+	pthread_mutex_unlock(&lock);
 }

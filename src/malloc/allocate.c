@@ -1,19 +1,21 @@
 #include "../../include/mem.h"
 
 // allocates the heap passed as argument if it doesn't exist, a new block on him and allocates a new used user space on the block of the size passed as argument 
-void	found_space_or_allocate(t_heap **heap, size_t size, int type)
+void	found_space_or_allocate(t_heap **heap, size_t size, int type_size)
 {
-	bool is_space_found = search_free_space(*heap, size);
-	if (is_space_found == false && data->error == false)
-		allocate(heap, size, type);
+	bool	is_space_found;
+
+	is_space_found = search_free_space(*heap, size);
+	if (is_space_found == false)
+		allocate(heap, size, type_size);
 }
 
-void	allocate(t_heap **heap, size_t size, size_t type)
+void	allocate(t_heap **heap, size_t size, size_t type_size)
 {
 
 	if (*heap == NULL)
-		initialize_heap(heap, type);
-	initialize_block(*heap, size, type);
+		initialize_heap(heap, type_size);
+	initialize_block(*heap, size, type_size);
 }
 
 void	allocate_large(size_t size)
@@ -36,5 +38,6 @@ void	allocate_large(size_t size)
 	initialize_large_heap(&new_large_heap, large_heap_prev, size);
 	if (data->error == true)
 		return ;
+
 	data->user_space_pointer = new_large_heap->start_user_space;
 }

@@ -14,9 +14,8 @@ void	*realloc(void *ptr, size_t size)
 		type = (size <= TINY_MAX_SIZE_ALLOC) ? TINY_MAX_SIZE_ALLOC : SMALL_MAX_SIZE_ALLOC;
 
 		// find the area or allocate a new one
-		find_new_area_or_allocate(heap_tmp, size, type);
+		found_space_or_allocate(heap_tmp, size, type);
 		if (data->error == false)
-
 			// copy the old data to the new area and free the old area
 			find_old_area_copy_and_free(ptr, size);
 	}

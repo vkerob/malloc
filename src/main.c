@@ -13,6 +13,8 @@ bool	test_tiny1(int show)
 	if (show)
 		show_alloc_mem();
 	free(str1);
+	str1 = malloc(1 * sizeof(char));
+	free(str1);
 	free(str2);
 	free(str3);
 	free(str4);
