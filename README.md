@@ -6,7 +6,7 @@ The project, as defined by school 42, aims to implement the malloc function from
 WARNING! This implementation is not that of the libc; it only follows certain principles and is therefore simplified.\
 If you want to see what the libc implementation looks like, a link is provided in the Documentation section.
 
-## plus de detailles sur les structures
+## More details on the structures
 
 Here is a detailed description of the structures:
 
@@ -91,7 +91,7 @@ typedef struct user_space
 
 The data structure being quite self-explanatory, I won't detail it here. (See mem.h)
 
-## plus de detaille sur la fonction search_free_space
+## More details on the search free_space function
 
 Why this function? Understanding it will help in understanding the others.
 
