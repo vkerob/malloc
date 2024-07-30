@@ -2,15 +2,10 @@
 
 void	check_if_block_is_unused(t_heap **heap, t_block **parent_block_used_user_space)
 {
-	if ((*parent_block_used_user_space)->used_user_space == NULL)
+	if ((*parent_block_used_user_space)->used_user_space == NULL && (*parent_block_used_user_space)->next != NULL)
 	{
 		unlink_block((*parent_block_used_user_space));
 		munmap((*parent_block_used_user_space), (*heap)->size);
-	}
-	if ((*heap)->start_block == NULL)
-	{
-		munmap((*heap), sizeof(t_heap));
-		(*heap) = NULL;
 	}
 }
 

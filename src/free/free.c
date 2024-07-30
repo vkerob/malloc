@@ -15,6 +15,7 @@ void	free(void *ptr)
 	}
 	data->user_space_pointer = NULL;
 	find_used_user_space_ptr(&used_user_space, &used_large_heap, ptr, &type);
+
 	if (type == TINY_SIZE || type == SMALL_SIZE)
 	{
 		heap_tmp = (type == TINY_SIZE) ? &(data->tiny_heap) : &(data->small_heap);
@@ -29,10 +30,12 @@ void	free(void *ptr)
 	}
 	else
 	{
+		// if it's not a type that we know we can determine if it's a double free
 		write(1, "Error: double free\n", 20);
 		pthread_mutex_unlock(&lock);
 		return ;
 	}
+
 	if (data->tiny_heap == NULL && data->small_heap == NULL && data->large_heap == NULL)
 	{
 		munmap(data, sizeof(t_data));
