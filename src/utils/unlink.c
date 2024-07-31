@@ -15,17 +15,17 @@ void	unlink_block(t_block *block)
 	if (block->prev != NULL)
 		block->prev->next = block->next;
 	else
-		block->parent_heap->start_block = block->next;
+		block->parent_heap->start = block->next;
 	if (block->next != NULL)
 		block->next->prev = block->prev;
 }
 
-void	unlink_used_user_space(t_user_space *used_user_space)
+void	unlink_chunk(t_chunk *chunk)
 {
-	if (used_user_space->prev != NULL)
-		used_user_space->prev->next = used_user_space->next;
+	if (chunk->prev != NULL)
+		chunk->prev->next = chunk->next;
 	else
-		used_user_space->parent_block->used_user_space = used_user_space->next;
-	if (used_user_space->next != NULL)
-		used_user_space->next->prev = used_user_space->prev;
+		chunk->parent_block->chunk = chunk->next;
+	if (chunk->next != NULL)
+		chunk->next->prev = chunk->prev;
 }

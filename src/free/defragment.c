@@ -1,17 +1,17 @@
 #include "../../include/mem.h"
 
-void defragment(t_user_space *used_user_space)
+void defragment(t_chunk *chunk)
 {
 	size_t			size;
 
 	// size is equal 
-	size = (size_t)align_address(used_user_space->start_user_space + used_user_space->size_allocated) - (size_t)used_user_space->start_user_space;
-	used_user_space->parent_block->free_size += ALLIGN_USER_SPACE + size;
+	size = (size_t)align_address(chunk->start + chunk->size_allocated) - (size_t)chunk->start;
+	chunk->parent_block->free_size += ALLIGN_CHUNK + size;
 
-	// if it's the first user_space in the block we add the size after the start of the block
-	if (used_user_space == used_user_space->parent_block->used_user_space)
-		used_user_space->parent_block->size_after += ALLIGN_USER_SPACE + size + used_user_space->size_after;
-	// else we add the size after the previous user_space
+	// if it's the first chunk in the block we add the size after the start of the block
+	if (chunk == chunk->parent_block->chunk)
+		chunk->parent_block->size_after += ALLIGN_CHUNK + size + chunk->size_after;
+	// else we add the size after the previous chunk
 	else
-		used_user_space->prev->size_after += ALLIGN_USER_SPACE + size + used_user_space->size_after;
+		chunk->prev->size_after += ALLIGN_CHUNK + size + chunk->size_after;
 }

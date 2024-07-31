@@ -14,7 +14,7 @@ SRC=	src/malloc/malloc.c \
 		src/free/delete.c \
 		src/free/defragment.c \
 		src/utils/show_alloc_mem.c \
-		src/utils/find_used_user_space_ptr.c \
+		src/utils/find_chunk_ptr.c \
 		src/utils/search_free_space.c \
 		src/utils/free_all.c \
 		src/utils/link.c \

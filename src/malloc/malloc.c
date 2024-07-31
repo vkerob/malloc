@@ -18,7 +18,7 @@ void	*malloc(size_t size)
 			return (NULL);
 		}
 	}
-	data->user_space_pointer = NULL;
+	data->chunk_start = NULL;
 	if (size <= TINY_MAX_SIZE_ALLOC || size <= SMALL_MAX_SIZE_ALLOC)
 	{
 		heap_tmp = (size <= TINY_MAX_SIZE_ALLOC) ? data->tiny_heap : data->small_heap;
@@ -31,7 +31,7 @@ void	*malloc(size_t size)
 	if (data->error == false)
 	{
 		pthread_mutex_unlock(&lock);
-		return (data->user_space_pointer);
+		return (data->chunk_start);
 	}
 	
 	// if error

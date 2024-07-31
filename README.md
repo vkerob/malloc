@@ -12,24 +12,24 @@ Here is a detailed description of the structures:
 
 Three structures are used to manage allocations of small, medium, and large memory sizes: tiny_heap, small_heap, and large_heap. (large_heap being different, the first two points do not apply to it)
 - Each structure contains a linked list of blocks.
-- Each block consists of a linked list of user spaces.
-- As for large_heap, it's a linked list where each link already contains the user space.
+- Each block consists of a linked list of chunk.
+- As for large_heap, it's a linked list where each link already contains the chunk.
 
 ### large_heap
 
 Here is what concerns the general information of the structures. Now, here are more details about each of them.
 
-As for large_heap, it has its own type because it is unique. It has neither user space nor block due to the size its allocations can reach (> 2048 bytes).
+As for large_heap, it has its own type because it is unique. It has neither chunk nor block due to the size its allocations can reach (> 2048 bytes).
 ```c
 typedef struct large_heap
 {
-	void				*start_user_space;
+	void				*start;
 	size_t				size_allocated;
 	struct large_heap	*next;
 	struct large_heap	*prev;
 }				t_large_heap;
 ```
-- start_user_space is the pointer to the beginning of the reserved space.
+- start is the pointer to the beginning of the reserved space.
 - size_allocated is the size of the reserved space.
 
 ### tiny/small_heap
@@ -41,11 +41,11 @@ The reason for this is that each block must be able to contain at least 100 allo
 typedef struct heap
 {
 	size_t				size;
-	struct block		*start_block;
+	struct block		*start;
 }				t_heap;
 ```
 - size represents its size (tiny/small heap).
-- start_block is a pointer to the first block.
+- start is a pointer to the first block.
 
 ### block
 
@@ -54,7 +54,7 @@ The blocks are exclusively contained either in tiny_heap or in small_heap.
 ```c
 typedef struct block
 {
-	struct user_space	*used_user_space;
+	struct chunk	*chunk;
 	struct heap			*parent_heap;
 	size_t				free_size;
 	size_t				size_after;
@@ -63,29 +63,29 @@ typedef struct block
 	
 }				t_block;
 ```
-- user_space is a pointer to the first user_space.
+- chunk is a pointer to the first chunk.
 - parent_heap is a pointer to its heap (tiny_heap or small_heap).
 - free_size is the total remaining free space within it.
-- size_after is the space between it and the next block or user_space.
+- size_after is the space between it and the next block or chunk.
 
-### user_space
+### chunk
 
 The user_spaces are exclusively contained within blocks.
 
 ```c
-typedef struct user_space
+typedef struct chunk
 {
-	void				*start_user_space;
+	void				*start;
 	size_t				size_after;
 	size_t				size_allocated;
 	struct block		*parent_block;
-	struct user_space	*next;
-	struct user_space	*prev;
-}				t_user_space;
+	struct chunk	*next;
+	struct chunk	*prev;
+}				t_chunk;
 ```
-- start_user_space is the pointer to the beginning of the reserved space.
+- start is the pointer to the beginning of the reserved space.
 - size_allocated is the size of the reserved space.
-- size_after is the space between it and the next block or user_space.
+- size_after is the space between it and the next block or chunk.
 - parent_block is a pointer to its block.
 
 
@@ -114,24 +114,24 @@ general view:
 ```
 As we can see, I had to align after the requested space, and size_to_add_to_align_address represents this alignment that I will have to perform.
 
-To calculate this alignment, I first started from the end of used_user_space1, which represents "start_user_space" (for example: 0x7ffff7fb6060). Then, I added the requested space (10) and called the align_address function, which rounds up to the nearest alignment. Finally, I subtracted the same thing without calling the function.
+To calculate this alignment, I first started from the end of used_user_space1, which represents "start" (for example: 0x7ffff7fb6060). Then, I added the requested space (10) and called the align_address function, which rounds up to the nearest alignment. Finally, I subtracted the same thing without calling the function.
 
 This results in (0x7ffff7fb6060 + 10 + 6) - (0x7ffff7fb6060 + 10) = 6 in our case.
 
-I deliberately omitted the alignment of struct block (ALIGN_BLOCK) or user_space (ALIGN_USER_SPACE) for clarity.
+I deliberately omitted the alignment of struct block (ALIGN_BLOCK) or chunk (ALIGN_USER_SPACE) for clarity.
 
 ###
 ```c
 bool	search_free_space(t_heap *heap, size_t size)
 {
 	t_block			*block;
-	t_user_space	*before_new_used_user_space;
+	t_chunk	*before_new_used_user_space;
 	size_t			size_to_add_to_align_address;
 
 
 	if (heap == NULL)
 		return (NULL);
-	block = heap->start_block;
+	block = heap->start;
 	while (block)
 	{
 
@@ -139,18 +139,18 @@ bool	search_free_space(t_heap *heap, size_t size)
 		if (block->free_size >= size)
 		{
 			size_to_add_to_align_address = (size_t)align_address((void *)block + ALLIGN_BLOCK + size) - (size_t)block - ALLIGN_BLOCK - size;
-			if (block->size_after >= size + size_to_add_to_align_address + ALLIGN_USER_SPACE)
+			if (block->size_after >= size + size_to_add_to_align_address + ALLIGN_CHUNK)
 			{
-				set_new_used_user_space(block, size, size_to_add_to_align_address, 1); // block->used_user_space = new_used_user_space
+				set_new_used_user_space(block, size, size_to_add_to_align_address, 1); // block->chunk = new_used_user_space
 				return (true);
 			}
 
-			// if after a used_user_space there is enough space to allocate the size
-			before_new_used_user_space = block->used_user_space;
+			// if after a chunk there is enough space to allocate the size
+			before_new_used_user_space = block->chunk;
 			while (before_new_used_user_space)
 			{
-				size_to_add_to_align_address = (size_t)align_address((void *)before_new_used_user_space->start_user_space + ALLIGN_USER_SPACE + size) - (size_t)before_new_used_user_space->start_user_space - ALLIGN_USER_SPACE - size;
-				if (before_new_used_user_space->size_after >= size + size_to_add_to_align_address + ALLIGN_USER_SPACE)
+				size_to_add_to_align_address = (size_t)align_address((void *)before_new_used_user_space->start + ALLIGN_CHUNK + size) - (size_t)before_new_used_user_space->start - ALLIGN_CHUNK - size;
+				if (before_new_used_user_space->size_after >= size + size_to_add_to_align_address + ALLIGN_CHUNK)
 				{
 					set_new_used_user_space(before_new_used_user_space, size, size_to_add_to_align_address, 0);
 					return (true);

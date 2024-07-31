@@ -7,7 +7,7 @@ void	*realloc(void *ptr, size_t size)
 	int		type;
 
 	pthread_mutex_lock(&lock);
-	data->user_space_pointer = NULL;
+	data->chunk_start = NULL;
 	if (size <= TINY_MAX_SIZE_ALLOC || size <= SMALL_MAX_SIZE_ALLOC)
 	{
 		heap_tmp = (size <= TINY_MAX_SIZE_ALLOC) ? data->tiny_heap : data->small_heap;
@@ -28,7 +28,7 @@ void	*realloc(void *ptr, size_t size)
 	if (data->error == false)
 	{
 		pthread_mutex_unlock(&lock);
-		return (data->user_space_pointer);
+		return (data->chunk_start);
 	}
 
 	// error detected, free all allocated memory

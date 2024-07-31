@@ -19,28 +19,28 @@ static void	ft_putnbr_base_fd(unsigned long nbr, char *base, int fd)
 static void	show_heap(t_heap *heap, size_t *total_size)
 {
 	t_block	*block;
-	t_user_space	*user_space;
+	t_chunk	*chunk;
 	int		i = 0;
 
-	block = heap->start_block;
+	block = heap->start;
 	while (block)
 	{
 		i++;
 		ft_printf("block %d: %p\n", i ,block);
-		user_space = block->used_user_space;
-		while (user_space)
+		chunk = block->chunk;
+		while (chunk)
 		{
 			ft_putstr_fd("0x", 1);
-			ft_putnbr_base_fd((unsigned long)(user_space->start_user_space), "0123456789ABCDEF", 1);
+			ft_putnbr_base_fd((unsigned long)(chunk->start), "0123456789ABCDEF", 1);
 			ft_putstr_fd(" - ", 1);
 			ft_putstr_fd("0x", 1);
-			size_t size_to_add_to_total = (size_t)align_address((void *)user_space->start_user_space + user_space->size_allocated) - (size_t)user_space->start_user_space;
-			ft_putnbr_base_fd((unsigned long)((size_t)align_address((void *)user_space->start_user_space + user_space->size_allocated)), "0123456789ABCDEF", 1);
+			size_t size_to_add_to_total = (size_t)align_address((void *)chunk->start + chunk->size_allocated) - (size_t)chunk->start;
+			ft_putnbr_base_fd((unsigned long)((size_t)align_address((void *)chunk->start + chunk->size_allocated)), "0123456789ABCDEF", 1);
 			ft_putstr_fd(" : ", 1);
-			ft_putnbr_base_fd(user_space->size_allocated, "0123456789", 1);
+			ft_putnbr_base_fd(chunk->size_allocated, "0123456789", 1);
 			ft_putstr_fd(" bytes\n", 1);
 			*total_size += size_to_add_to_total + ALLIGN_HEAP;
-			user_space = user_space->next;
+			chunk = chunk->next;
 		}
 		block = block->next;
 	}
@@ -54,11 +54,11 @@ void	show_large_heap(size_t *total_size)
 	while (large_heap)
 	{
 		ft_putstr_fd("0x", 1);
-		ft_putnbr_base_fd((unsigned long)(large_heap->start_user_space), "0123456789ABCDEF", 1);
+		ft_putnbr_base_fd((unsigned long)(large_heap->start), "0123456789ABCDEF", 1);
 		ft_putstr_fd(" - ", 1);
 		ft_putstr_fd("0x", 1);
-		size_t size_to_add_to_total = (size_t)align_address((void *)large_heap->start_user_space + large_heap->size_allocated) - (size_t)large_heap->start_user_space;
-		ft_putnbr_base_fd((unsigned long)((size_t)align_address((void *)large_heap->start_user_space + large_heap->size_allocated)), "0123456789ABCDEF", 1);
+		size_t size_to_add_to_total = (size_t)align_address((void *)large_heap->start + large_heap->size_allocated) - (size_t)large_heap->start;
+		ft_putnbr_base_fd((unsigned long)((size_t)align_address((void *)large_heap->start + large_heap->size_allocated)), "0123456789ABCDEF", 1);
 		ft_putstr_fd(" : ", 1);
 		ft_putnbr_base_fd(large_heap->size_allocated, "0123456789", 1);
 		ft_putstr_fd(" bytes\n", 1);
@@ -74,21 +74,21 @@ void	show_alloc_mem()
 	pthread_mutex_lock(&lock);
 	if (data == NULL)
 		return ;
-	if (data->tiny_heap && data->tiny_heap->start_block && data->tiny_heap->start_block->used_user_space)
+	if (data->tiny_heap && data->tiny_heap->start && data->tiny_heap->start->chunk)
 	{
 		ft_putstr_fd("TINY", 1);
 		ft_putstr_fd(" : ", 1);
 		ft_putstr_fd("0x", 1);
-		ft_putnbr_base_fd((unsigned long)(data->tiny_heap->start_block), "0123456789ABCDEF", 1);
+		ft_putnbr_base_fd((unsigned long)(data->tiny_heap->start), "0123456789ABCDEF", 1);
 		ft_putstr_fd("\n", 1);
 		show_heap(data->tiny_heap, &total_size);
 	}
-	if (data->small_heap && data->small_heap->start_block && data->small_heap->start_block->used_user_space)
+	if (data->small_heap && data->small_heap->start && data->small_heap->start->chunk)
 	{
 		ft_putstr_fd("SMALL", 1);
 		ft_putstr_fd(" : ", 1);
 		ft_putstr_fd("0x", 1);
-		ft_putnbr_base_fd((unsigned long)(data->small_heap->start_block), "0123456789ABCDEF", 1);
+		ft_putnbr_base_fd((unsigned long)(data->small_heap->start), "0123456789ABCDEF", 1);
 		ft_putstr_fd("\n", 1);
 		show_heap(data->small_heap, &total_size);
 	}

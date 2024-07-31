@@ -5,7 +5,7 @@ void	free_heap(t_heap *heap)
 	t_block	*block;
 	t_block	*tmp;
 
-	block = heap->start_block;
+	block = heap->start;
 	while (block)
 	{
 		tmp = block->next;
@@ -22,7 +22,7 @@ void	free_large_heap(t_large_heap *heap)
 	while (heap)
 	{
 		tmp = heap->next;
-		free(heap->start_user_space);
+		free(heap->start);
 		free(heap);
 		heap = tmp;
 	}

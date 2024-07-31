@@ -1,11 +1,11 @@
 #include "../../include/mem.h"
 
-void	check_if_block_is_unused(t_heap **heap, t_block **parent_block_used_user_space)
+void	check_if_block_is_unused(t_heap **heap, t_block **parent_block_chunk)
 {
-	if ((*parent_block_used_user_space)->used_user_space == NULL && (*parent_block_used_user_space)->next != NULL)
+	if ((*parent_block_chunk)->chunk == NULL && (*parent_block_chunk)->next != NULL)
 	{
-		unlink_block((*parent_block_used_user_space));
-		munmap((*parent_block_used_user_space), (*heap)->size);
+		unlink_block((*parent_block_chunk));
+		munmap((*parent_block_chunk), (*heap)->size);
 	}
 }
 

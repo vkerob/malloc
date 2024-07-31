@@ -2,26 +2,28 @@
 
 void	free(void *ptr)
 {
-	t_user_space	*used_user_space;
+	t_chunk	*chunk;
 	t_large_heap	*used_large_heap;
 	t_heap			**heap_tmp;
 	size_t			type = 0;
 
 	pthread_mutex_lock(&lock);
+
 	if (ptr == NULL)
 	{
 		pthread_mutex_unlock(&lock);
 		return ;
 	}
-	data->user_space_pointer = NULL;
-	find_used_user_space_ptr(&used_user_space, &used_large_heap, ptr, &type);
+
+	data->chunk_start = NULL;
+	find_chunk_ptr(&chunk, &used_large_heap, ptr, &type);
 
 	if (type == TINY_SIZE || type == SMALL_SIZE)
 	{
 		heap_tmp = (type == TINY_SIZE) ? &(data->tiny_heap) : &(data->small_heap);
-		defragment(used_user_space);
-		unlink_used_user_space(used_user_space);
-		check_if_block_is_unused(heap_tmp, (&used_user_space->parent_block));
+		defragment(chunk);
+		unlink_chunk(chunk);
+		check_if_block_is_unused(heap_tmp, (&chunk->parent_block));
 	}
 	else if (type == LARGE)
 	{

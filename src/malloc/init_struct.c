@@ -10,27 +10,33 @@ void	*align_address(void *ptr)
     return (void *)addr;
 }
 
+
 void	initialize_data(t_data **data)
 {
 	struct rlimit	rlimit;
 
 	if (getrlimit(RLIMIT_AS, &rlimit) == -1)
 		return ;
+
 	if (ALLIGN_DATA >= rlimit.rlim_max)
 		return ;
-	*data = (t_data *)mmap(NULL, ALLIGN_DATA + ALLIGN_HEAP * 2, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+	*data = (t_data *)mmap(NULL, ALLIGN_DATA + ALLIGN_HEAP * 2 , PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (*data == MAP_FAILED)
 		return ;
+
 	(*data)->rlimit = rlimit;
 	(*data)->error = false;
-	(*data)->user_space_pointer = NULL;
+	(*data)->chunk_start = NULL;
 
 	(*data)->tiny_heap = (t_heap *)(*data + ALLIGN_DATA);
-	(*data)->tiny_heap->start_block = NULL;
+	(*data)->tiny_heap->start = NULL;
 	(*data)->tiny_heap->size = TINY_SIZE;
+
 	(*data)->small_heap = (t_heap *)((*data)->tiny_heap + ALLIGN_HEAP);
-	(*data)->small_heap->start_block = NULL;
+	(*data)->small_heap->start = NULL;
 	(*data)->small_heap->size = SMALL_SIZE;
+
 	(*data)->large_heap = NULL;
 }
 
@@ -38,7 +44,7 @@ void	initialize_data(t_data **data)
 void	initialize_heap(t_heap **heap, size_t type_size)
 {
 
-	(*heap)->start_block = NULL;
+	(*heap)->start = NULL;
 	(*heap)->size = type_size;
 }
 
@@ -57,27 +63,28 @@ void	initialize_large_heap(t_large_heap **new_large_heap, t_large_heap *large_he
 		return ;
 	}
 	// initialize the new node large_heap
-	(*new_large_heap)->start_user_space = (void *)(*new_large_heap) + ALLIGN_LARGE_HEAP;
+	(*new_large_heap)->start = (void *)(*new_large_heap) + ALLIGN_LARGE_HEAP;
 	(*new_large_heap)->size_allocated = size;
 
 	// link the new node large_heap
 	link_large_heap((*new_large_heap), large_heap_prev);
 }
 
+
 static void	initialize_used_user_space(t_block *block, size_t size)
 {
-	// add new used_user_space
-	block->used_user_space = (void *)block + ALLIGN_BLOCK;
-	block->used_user_space->start_user_space = (void *)block->used_user_space + ALLIGN_USER_SPACE;
-	block->used_user_space->size_allocated = size;
-	block->used_user_space->parent_block = block;
-	block->used_user_space->next = NULL;
-	block->used_user_space->prev = NULL;
+	// add new chunk
+	block->chunk = (void *)block + ALLIGN_BLOCK;
+	block->chunk->start = (void *)block->chunk + ALLIGN_CHUNK;
+	block->chunk->size_allocated = size;
+	block->chunk->parent_block = block;
+	block->chunk->next = NULL;
+	block->chunk->prev = NULL;
 
-	int size_to_withdraw = (size_t)align_address((void *)block + ALLIGN_BLOCK + ALLIGN_USER_SPACE + size) - (size_t)block - ALLIGN_BLOCK;
+	int size_to_withdraw = (size_t)align_address((void *)block + ALLIGN_BLOCK + ALLIGN_CHUNK + size) - (size_t)block - ALLIGN_BLOCK;
 	block->free_size = block->free_size - size_to_withdraw;
-	block->used_user_space->size_after = block->free_size;
-	data->user_space_pointer = block->used_user_space->start_user_space;
+	block->chunk->size_after = block->free_size;
+	data->chunk_start = block->chunk->start;
 }
 
 void	allocate(t_heap *heap, size_t size, size_t type_size)
@@ -86,7 +93,7 @@ void	allocate(t_heap *heap, size_t size, size_t type_size)
 	t_block	*block_prev = NULL;
 
 	// find the last block
-	block = heap->start_block;
+	block = heap->start;
 	if (block != NULL)
 	{
 		while (block->next)
@@ -117,7 +124,7 @@ void	allocate(t_heap *heap, size_t size, size_t type_size)
 	}
 	else
 	{
-		heap->start_block = block;
+		heap->start = block;
 		block->prev = NULL;
 	}
 	block->next = NULL;
