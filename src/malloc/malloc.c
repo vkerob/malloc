@@ -9,6 +9,7 @@ void	*malloc(size_t size)
 	int		type_size;
 
 	pthread_mutex_lock(&lock);
+
 	if (data == NULL)
 	{
 		initialize_data(&data);
@@ -18,7 +19,9 @@ void	*malloc(size_t size)
 			return (NULL);
 		}
 	}
+
 	data->chunk_start = NULL;
+
 	if (size <= TINY_MAX_SIZE_ALLOC || size <= SMALL_MAX_SIZE_ALLOC)
 	{
 		heap_tmp = (size <= TINY_MAX_SIZE_ALLOC) ? data->tiny_heap : data->small_heap;

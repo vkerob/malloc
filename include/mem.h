@@ -114,6 +114,8 @@ void	*align_address(void *ptr);
 
 //  general utils functions
 bool	search_free_space(t_heap *heap, size_t size);
+bool	set_after_chunk(t_block *block, size_t size);
+bool	set_after_block(t_block *block, size_t size);
 void	find_chunk_ptr(t_chunk **chunk_tmp, t_large_heap **large_heap_tmp ,void *ptr, size_t *type);
 // unlink functions
 void	unlink_large_heap(t_large_heap *large_heap);

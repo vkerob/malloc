@@ -6,8 +6,10 @@ void	found_space_or_allocate(t_heap *heap, size_t size, int type_size)
 	bool	is_space_found;
 
 	is_space_found = search_free_space(heap, size);
+
 	if (is_space_found == false)
 		allocate(heap, size, type_size);
+
 }
 
 
@@ -29,6 +31,7 @@ void	allocate_large(size_t size)
 
 	// allocate and initialize the new large heap
 	initialize_large_heap(&new_large_heap, large_heap_prev, size);
+
 	if (data->error == true)
 		return ;
 

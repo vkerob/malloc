@@ -8,6 +8,7 @@ void	*realloc(void *ptr, size_t size)
 
 	pthread_mutex_lock(&lock);
 	data->chunk_start = NULL;
+
 	if (size <= TINY_MAX_SIZE_ALLOC || size <= SMALL_MAX_SIZE_ALLOC)
 	{
 		heap_tmp = (size <= TINY_MAX_SIZE_ALLOC) ? data->tiny_heap : data->small_heap;
@@ -15,9 +16,11 @@ void	*realloc(void *ptr, size_t size)
 
 		// find the area or allocate a new one
 		found_space_or_allocate(heap_tmp, size, type);
+
 		if (data->error == false)
 			// copy the old data to the new area and free the old area
 			find_old_area_copy_and_free(ptr, size);
+	
 	}
 	else
 	{
@@ -25,6 +28,7 @@ void	*realloc(void *ptr, size_t size)
 		if (data->error == false)
 			find_old_area_copy_and_free(ptr, size);
 	}
+
 	if (data->error == false)
 	{
 		pthread_mutex_unlock(&lock);

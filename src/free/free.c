@@ -32,19 +32,10 @@ void	free(void *ptr)
 	}
 	else
 	{
-		// if it's not a type that we know we can determine if it's a double free
-		write(1, "Error: double free\n", 20);
+		ft_printf("Error: impossible to free this pointer\n");
 		pthread_mutex_unlock(&lock);
 		return ;
 	}
 
-	if (data->tiny_heap == NULL && data->small_heap == NULL && data->large_heap == NULL)
-	{
-		munmap(data, sizeof(t_data));
-		data = NULL;
-		pthread_mutex_unlock(&lock);
-		pthread_mutex_destroy(&lock);
-	}
-	else
-		pthread_mutex_unlock(&lock);
+	pthread_mutex_unlock(&lock);
 }

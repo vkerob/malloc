@@ -27,7 +27,6 @@ void	initialize_data(t_data **data)
 
 	(*data)->rlimit = rlimit;
 	(*data)->error = false;
-	(*data)->chunk_start = NULL;
 
 	(*data)->tiny_heap = (t_heap *)(*data + ALLIGN_DATA);
 	(*data)->tiny_heap->start = NULL;
@@ -56,12 +55,15 @@ void	initialize_large_heap(t_large_heap **new_large_heap, t_large_heap *large_he
 		data->error = true;
 		return ;
 	}
+
 	(*new_large_heap) = mmap(NULL, ALLIGN_LARGE_HEAP + size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+
 	if (*new_large_heap == MAP_FAILED)
 	{
 		data->error = true;
 		return ;
 	}
+
 	// initialize the new node large_heap
 	(*new_large_heap)->start = (void *)(*new_large_heap) + ALLIGN_LARGE_HEAP;
 	(*new_large_heap)->size_allocated = size;
@@ -94,6 +96,7 @@ void	allocate(t_heap *heap, size_t size, size_t type_size)
 
 	// find the last block
 	block = heap->start;
+
 	if (block != NULL)
 	{
 		while (block->next)
@@ -110,6 +113,7 @@ void	allocate(t_heap *heap, size_t size, size_t type_size)
 
 	// allocate the block
 	block = mmap(NULL, type_size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+
 	if (block == MAP_FAILED)
 	{
 		data->error = true;

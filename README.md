@@ -141,7 +141,7 @@ bool	search_free_space(t_heap *heap, size_t size)
 			size_to_add_to_align_address = (size_t)align_address((void *)block + ALLIGN_BLOCK + size) - (size_t)block - ALLIGN_BLOCK - size;
 			if (block->size_after >= size + size_to_add_to_align_address + ALLIGN_CHUNK)
 			{
-				set_new_used_user_space(block, size, size_to_add_to_align_address, 1); // block->chunk = new_used_user_space
+				set_new_chunk(block, size, size_to_add_to_align_address, 1); // block->chunk = new_used_user_space
 				return (true);
 			}
 
@@ -152,7 +152,7 @@ bool	search_free_space(t_heap *heap, size_t size)
 				size_to_add_to_align_address = (size_t)align_address((void *)before_new_used_user_space->start + ALLIGN_CHUNK + size) - (size_t)before_new_used_user_space->start - ALLIGN_CHUNK - size;
 				if (before_new_used_user_space->size_after >= size + size_to_add_to_align_address + ALLIGN_CHUNK)
 				{
-					set_new_used_user_space(before_new_used_user_space, size, size_to_add_to_align_address, 0);
+					set_new_chunk(before_new_used_user_space, size, size_to_add_to_align_address, 0);
 					return (true);
 				}
 				before_new_used_user_space = before_new_used_user_space->next;

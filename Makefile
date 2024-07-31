@@ -16,6 +16,7 @@ SRC=	src/malloc/malloc.c \
 		src/utils/show_alloc_mem.c \
 		src/utils/find_chunk_ptr.c \
 		src/utils/search_free_space.c \
+		src/utils/set_new_chunk.c \
 		src/utils/free_all.c \
 		src/utils/link.c \
 		src/utils/unlink.c

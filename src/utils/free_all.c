@@ -6,12 +6,14 @@ void	free_heap(t_heap *heap)
 	t_block	*tmp;
 
 	block = heap->start;
+
 	while (block)
 	{
 		tmp = block->next;
 		free(block);
 		block = tmp;
 	}
+
 	free(heap);
 }
 
@@ -32,10 +34,13 @@ void	free_all(void)
 {
 	if (data->tiny_heap)
 		free_heap(data->tiny_heap);
+
 	if (data->small_heap)
 		free_heap(data->small_heap);
+
 	if (data->large_heap)
 		free_large_heap(data->large_heap);
+
 	free(data);
 	pthread_mutex_unlock(&lock);
 }

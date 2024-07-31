@@ -14,4 +14,5 @@ void defragment(t_chunk *chunk)
 	// else we add the size after the previous chunk
 	else
 		chunk->prev->size_after += ALLIGN_CHUNK + size + chunk->size_after;
+
 }
