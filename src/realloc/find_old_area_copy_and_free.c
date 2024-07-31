@@ -2,6 +2,7 @@
 
 static void	copy_and_free(t_chunk *chunk_tmp, void *ptr, size_t size)
 {
+	// copy the data from the old area to the new area
 	size_t	i = 0;
 
 	while (i < chunk_tmp->size_allocated && i < size)
@@ -14,6 +15,7 @@ static void	copy_and_free(t_chunk *chunk_tmp, void *ptr, size_t size)
 
 static void	copy_and_free_large(t_large_heap *large_heap_tmp, void *ptr, size_t size)
 {
+	// copy the data from the old area to the new area
 	size_t	i = 0;
 
 	while (i < large_heap_tmp->size_allocated && i < size)
@@ -33,6 +35,10 @@ static void	copy_and_free_large(t_large_heap *large_heap_tmp, void *ptr, size_t 
 
 void	find_old_area_copy_and_free(void *ptr, size_t size)
 {
+	// find the chunk in the heap tiny, small or large
+	// copy the data from the old area to the new area
+	// free the old area
+
 	t_chunk			*chunk_tmp;
 	t_large_heap	*large_heap_tmp;
 	size_t			type;

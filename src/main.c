@@ -303,6 +303,8 @@ void	test_heap()
 
 int main()
 {
-	test_heap();
+	//test_heap();
+	char *str1 = malloc(1 * sizeof(char));
+	
 	return (0);
 }

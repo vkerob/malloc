@@ -48,6 +48,9 @@ static t_large_heap	*find_in_large_heap(void *ptr)
 // find the chunk in the heap tiny, small or large
 void	find_chunk_ptr(t_chunk **chunk_tmp, t_large_heap **large_heap_tmp ,void *ptr, size_t *type)
 {
+	// search for the chunk in the heap tiny, small or large
+	// if the pointer is found, set the type to the type of the heap
+	// if the pointer is not found, set the type to 0
 
 	*chunk_tmp = find_in_heap(data->tiny_heap, ptr);
 

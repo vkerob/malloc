@@ -2,6 +2,10 @@
 
 void defragment(t_chunk *chunk)
 {
+	// defragment the chunk passed as argument
+	// add the size of the chunk to the free size of the block
+	// if it's the first chunk in the block we add the size after the start of the block
+	// else we add the size after the previous chunk
 	size_t			size;
 
 	// size is equal 

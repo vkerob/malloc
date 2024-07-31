@@ -8,7 +8,16 @@ void	*malloc(size_t size)
 	t_heap	*heap_tmp;
 	int		type_size;
 
+	// this function allocates a block of memory, for more details of how many bytes are allocated check the mem.h
+	// if the size is 0, return NULL else return the pointer to the start of the allocated memory for the user
+
 	pthread_mutex_lock(&lock);
+
+	if (size == 0)
+	{
+		pthread_mutex_unlock(&lock);
+		return (NULL);
+	}
 
 	if (data == NULL)
 	{

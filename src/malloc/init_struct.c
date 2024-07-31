@@ -15,6 +15,8 @@ void	initialize_data(t_data **data)
 {
 	struct rlimit	rlimit;
 
+	// initialize the data struct data and heap tiny, small
+
 	if (getrlimit(RLIMIT_AS, &rlimit) == -1)
 		return ;
 
@@ -29,12 +31,10 @@ void	initialize_data(t_data **data)
 	(*data)->error = false;
 
 	(*data)->tiny_heap = (t_heap *)(*data + ALLIGN_DATA);
-	(*data)->tiny_heap->start = NULL;
-	(*data)->tiny_heap->size = TINY_SIZE;
+	initialize_heap(&(*data)->tiny_heap, TINY_SIZE);
 
 	(*data)->small_heap = (t_heap *)((*data)->tiny_heap + ALLIGN_HEAP);
-	(*data)->small_heap->start = NULL;
-	(*data)->small_heap->size = SMALL_SIZE;
+	initialize_heap(&(*data)->small_heap, SMALL_SIZE);
 
 	(*data)->large_heap = NULL;
 }
@@ -42,6 +42,7 @@ void	initialize_data(t_data **data)
 
 void	initialize_heap(t_heap **heap, size_t type_size)
 {
+	// initialize the heap
 
 	(*heap)->start = NULL;
 	(*heap)->size = type_size;
@@ -50,6 +51,8 @@ void	initialize_heap(t_heap **heap, size_t type_size)
 
 void	initialize_large_heap(t_large_heap **new_large_heap, t_large_heap *large_heap_prev, size_t size)
 {
+	// initialize the large heap
+
 	if (sizeof(t_large_heap) + size >= data->rlimit.rlim_max)
 	{
 		data->error = true;
@@ -73,8 +76,10 @@ void	initialize_large_heap(t_large_heap **new_large_heap, t_large_heap *large_he
 }
 
 
-static void	initialize_used_user_space(t_block *block, size_t size)
+static void	initialize_chunk(t_block *block, size_t size)
 {
+	// initialize the used user space
+
 	// add new chunk
 	block->chunk = (void *)block + ALLIGN_BLOCK;
 	block->chunk->start = (void *)block->chunk + ALLIGN_CHUNK;
@@ -83,6 +88,8 @@ static void	initialize_used_user_space(t_block *block, size_t size)
 	block->chunk->next = NULL;
 	block->chunk->prev = NULL;
 
+	// The size to withdraw is the size needed for alignment. 
+	// For example, if size = 1, size_to_withdraw = 48 (chunk metadata) + 16 (1 user space + 15 padding) = 64.
 	int size_to_withdraw = (size_t)align_address((void *)block + ALLIGN_BLOCK + ALLIGN_CHUNK + size) - (size_t)block - ALLIGN_BLOCK;
 	block->free_size = block->free_size - size_to_withdraw;
 	block->chunk->size_after = block->free_size;
@@ -91,6 +98,8 @@ static void	initialize_used_user_space(t_block *block, size_t size)
 
 void	allocate(t_heap *heap, size_t size, size_t type_size)
 {
+	// allocate a new block in the heap passed as argument and initialize the used user space
+
 	t_block	*block = NULL;
 	t_block	*block_prev = NULL;
 
@@ -138,5 +147,5 @@ void	allocate(t_heap *heap, size_t size, size_t type_size)
 	block->free_size = type_size - ALLIGN_BLOCK;
 
 	block->size_after = 0;
-	initialize_used_user_space(block, size);
+	initialize_chunk(block, size);
 }

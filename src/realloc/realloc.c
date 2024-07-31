@@ -3,10 +3,19 @@
 
 void	*realloc(void *ptr, size_t size)
 {
+	// realloc the memory area pointed to by ptr to size bytes
+	// if ptr is NULL, the call is equivalent to malloc(size)
 	t_heap	*heap_tmp;
 	int		type;
 
 	pthread_mutex_lock(&lock);
+
+	if (size == 0)
+	{
+		pthread_mutex_unlock(&lock);
+		return (NULL);
+	}
+
 	data->chunk_start = NULL;
 
 	if (size <= TINY_MAX_SIZE_ALLOC || size <= SMALL_MAX_SIZE_ALLOC)

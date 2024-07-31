@@ -2,6 +2,13 @@
 
 void	free(void *ptr)
 {
+	// try to find the chunk in the heap tiny, small or large
+	// if the pointer is NULL, return
+	// if the pointer is found, defragment the chunk, unlink the chunk, 
+	// check if the block is unused and free the block only if it's not the last block
+
+
+
 	t_chunk	*chunk;
 	t_large_heap	*used_large_heap;
 	t_heap			**heap_tmp;
@@ -28,7 +35,7 @@ void	free(void *ptr)
 	else if (type == LARGE)
 	{
 		unlink_large_heap(used_large_heap);
-		delete_large_heap(used_large_heap);
+		munmap(used_large_heap, used_large_heap->size_allocated + ALLIGN_LARGE_HEAP);
 	}
 	else
 	{
