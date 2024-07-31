@@ -1,4 +1,4 @@
-CC=gcc -Wpadded
+CC=gcc
 
 CFLAGS= -Wall -Wextra -fPIC -g
 

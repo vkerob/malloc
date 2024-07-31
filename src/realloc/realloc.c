@@ -3,7 +3,7 @@
 
 void	*realloc(void *ptr, size_t size)
 {
-	t_heap	**heap_tmp;
+	t_heap	*heap_tmp;
 	int		type;
 
 	pthread_mutex_lock(&lock);

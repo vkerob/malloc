@@ -34,7 +34,7 @@
 // SMALL_MAX_SIZE_ALLOC = 2560 bytes
 // LARGE_MAX_SIZE_ALLOC > 2560 bytes
 #define TINY_MAX_SIZE_ALLOC		(size_t)((TINY_SIZE - ALLIGN_BLOCK) / 100) - ALLIGN_CHUNK - MEN_ALLIGN		// 163 - 48 bytes = 115 bytes - 16 bytes (allign) = 99 bytes
-#define SMALL_MAX_SIZE_ALLOC	(size_t)((SMALL_SIZE - ALLIGN_BLOCK) / 100) - ALLIGN_CHUNK - MEN_ALLIGN	// 2620 - 48 bytes = 2576 bytes - 16 bytes (allign) = 2560 bytes
+#define SMALL_MAX_SIZE_ALLOC	(size_t)((SMALL_SIZE - ALLIGN_BLOCK) / 100) - ALLIGN_CHUNK - MEN_ALLIGN	// 2620 - 48 bytes = 2572 bytes - 16 bytes (allign) = 2556 bytes
 
 #define MEN_ALLIGN 				16
 #define ALLIGN_DATA 			(size_t)align_address((void *)sizeof(t_data))

@@ -6,14 +6,14 @@
 #    By: vkerob <vkerob@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/05 14:11:42 by vkerob            #+#    #+#              #
-#    Updated: 2023/01/18 15:41:38 by vkerob           ###   ########.fr        #
+#    Updated: 2024/07/31 13:47:39 by vkerob           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 
 CC = clang
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -fPIC
 
 NAME = libft.a
 
