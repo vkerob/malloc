@@ -6,7 +6,7 @@
 #    By: vkerob <vkerob@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/05 14:11:42 by vkerob            #+#    #+#              #
-#    Updated: 2024/07/31 13:47:39 by vkerob           ###   ########.fr        #
+#    Updated: 2024/08/02 15:34:48 by vkerob           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -74,6 +74,7 @@ SRC = ft_atoi.c \
 		ft_printf/ft_putnbr_ct_1.c \
 		ft_printf/ft_putnbr_ct_2.c \
 		ft_printf/ft_adress.c \
+		ft_printf/ft_strlen.c 
 
 OBJ = $(SRC:.c=.o)
 
