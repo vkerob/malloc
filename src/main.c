@@ -2,10 +2,10 @@
 
 bool	test_tiny1(int show)
 {
-	char *str1 = malloc(99 * sizeof(char));
-	char *str2 = malloc(99 * sizeof(char));
-	char *str3 = malloc(100 * sizeof(char));
-	char *str4 = malloc(99 * sizeof(char));
+	char *str1 = malloc(112 * sizeof(char));
+	char *str2 = malloc(112 * sizeof(char));
+	char *str3 = malloc(113 * sizeof(char));
+	char *str4 = malloc(112 * sizeof(char));
 	(void)str1;
 	(void)str2;
 	(void)str3;
@@ -294,7 +294,47 @@ void	test_large()
 		write(1, "test_large4 failed\n", 20);
 }
 
-void	test_heap()
+void	tiny_100()
+{
+	ft_printf("\ntiny_100:\n");
+	char **strs = malloc(100 * sizeof(char *));
+	for (int i = 0; i < 100; i++)
+	{
+		strs[i] = malloc(112 * sizeof(char));
+		(void)strs[i];
+	}
+	show_alloc_mem();
+	for (int i = 0; i < 100; i++)
+	{
+		free(strs[i]);
+	}
+	free(strs);
+}
+
+void	small_100()
+{
+	ft_printf("\nsmall_100:\n");
+	char **strs = malloc(100 * sizeof(char *));
+	for (int i = 0; i < 100; i++)
+	{
+		strs[i] = malloc(2560 * sizeof(char));
+		(void)strs[i];
+	}
+	show_alloc_mem();
+	for (int i = 0; i < 100; i++)
+	{
+		free(strs[i]);
+	}
+	free(strs);
+}
+
+void	alloacte_test_100()
+{
+	tiny_100();
+	small_100();
+}
+
+void	basic_test_heap()
 {
 	test_tiny();
 	test_small();
@@ -303,8 +343,8 @@ void	test_heap()
 
 int main()
 {
-	//test_heap();
-	char *str1 = malloc(1 * sizeof(char));
+	//basic_test_heap();
+	alloacte_test_100();
 	
 	return (0);
 }

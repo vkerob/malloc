@@ -11,11 +11,18 @@
 #include <stdint.h>
 #include "../libft/libft.h"
 
-#define PAGE_SIZE getpagesize()
+#define PAGE_SIZE sysconf(_SC_PAGESIZE)
 
 #define TINY_SIZE 				(size_t)(PAGE_SIZE * 4)		// 16384 bytes
 #define SMALL_SIZE 				(size_t)(PAGE_SIZE * 64)	// 262144 bytes
 #define LARGE 					1
+
+#define MEN_ALLIGN 				16
+#define ALLIGN_DATA 			(size_t)align_address((void *)sizeof(t_data))
+#define ALLIGN_BLOCK 			(size_t)align_address((void *)sizeof(t_block))
+#define ALLIGN_CHUNK 		(size_t)align_address((void *)sizeof(t_chunk))
+#define ALLIGN_HEAP 			(size_t)align_address((void *)sizeof(t_heap))
+#define ALLIGN_LARGE_HEAP 		(size_t)align_address((void *)sizeof(t_large_heap))
 // This implementation initializes a struct (data) at the beginning of 64 bytes. For example:
 // Minimum allocation: 64 bytes (data) + 48 bytes (block size) + 48 bytes (chunk) = 160 bytes + size chosen by the user + alignment.
 // If the user asks for 1 byte, the program will allocate 176 bytes (160 + 1 + 15) = 176 bytes because of alignment.
@@ -24,7 +31,7 @@
 // Here we determine the maximum size of an allocation in each type of heap.
 // We want to have a minimum of 100 allocations in each heap (trying to reproduce the behavior of the real malloc and respecting the 42 subject).
 // How we calculate the maximum size of an allocation in each heap:
-// For Tiny heap: (16384 - 48) / 100 = 115 bytes - 16 bytes (alignment) = 99 bytes.
+// For Tiny heap: (16384 - 48) / 100 = 115 bytes - 16 bytes (alignment) = 99 bytes + 13 bytes (alignment) = 112 bytes
 // As a precaution, we subtract 16 bytes from the result to ensure that we can allocate 100 allocations because, for example,
 // if we allocate 100 allocations of 113 bytes + 48 bytes (chunk) = 161 bytes, we are going to align the address to 176 bytes and
 // we will not be able to allocate 100 allocations because 100 * 176 = 17600 > 16384.
@@ -33,15 +40,9 @@
 // TINY_MAX_SIZE_ALLOC = 99 bytes
 // SMALL_MAX_SIZE_ALLOC = 2560 bytes
 // LARGE_MAX_SIZE_ALLOC > 2560 bytes
-#define TINY_MAX_SIZE_ALLOC		(size_t)((TINY_SIZE - ALLIGN_BLOCK) / 100) - ALLIGN_CHUNK - MEN_ALLIGN		// 163 - 48 bytes = 115 bytes - 16 bytes (allign) = 99 bytes
-#define SMALL_MAX_SIZE_ALLOC	(size_t)((SMALL_SIZE - ALLIGN_BLOCK) / 100) - ALLIGN_CHUNK - MEN_ALLIGN	// 2620 - 48 bytes = 2572 bytes - 16 bytes (allign) = 2556 bytes
+#define TINY_MAX_SIZE_ALLOC		(size_t)align_address((void *)(size_t)((TINY_SIZE - ALLIGN_BLOCK) / 100) - ALLIGN_CHUNK - MEN_ALLIGN)		// 163 - 48 bytes = 115 bytes - 16 bytes (allign) = 99 bytes + 13 bytes (allign) = 112 bytes
+#define SMALL_MAX_SIZE_ALLOC	(size_t)align_address((void *)(size_t)((SMALL_SIZE - ALLIGN_BLOCK) / 100) - ALLIGN_CHUNK - MEN_ALLIGN)	// 2620 - 48 bytes = 2572 bytes - 16 bytes (allign) = 2556 bytes + 4 bytes (allign) = 2560 bytes
 
-#define MEN_ALLIGN 				16
-#define ALLIGN_DATA 			(size_t)align_address((void *)sizeof(t_data))
-#define ALLIGN_BLOCK 			(size_t)align_address((void *)sizeof(t_block))
-#define ALLIGN_CHUNK 		(size_t)align_address((void *)sizeof(t_chunk))
-#define ALLIGN_HEAP 			(size_t)align_address((void *)sizeof(t_heap))
-#define ALLIGN_LARGE_HEAP 		(size_t)align_address((void *)sizeof(t_large_heap))
 
 
 extern pthread_mutex_t lock;
@@ -132,7 +133,6 @@ void	find_old_area_copy_and_free(void *ptr, size_t size);
 // free utils functions
 // delete functions
 void	check_if_block_is_unused(t_heap **heap, t_block **parent_block_chunk);
-void	delete_large_heap(t_large_heap *large_heap);
 // add functions
 void	defragment(t_chunk *chunk);
 

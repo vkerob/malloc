@@ -26,7 +26,6 @@ static void	show_heap(t_heap *heap, size_t *total_size)
 	while (block)
 	{
 		i++;
-		ft_printf("block %d: %p\n", i ,block);
 		chunk = block->chunk;
 		while (chunk)
 		{
@@ -39,9 +38,10 @@ static void	show_heap(t_heap *heap, size_t *total_size)
 			ft_putstr_fd(" : ", 1);
 			ft_putnbr_base_fd(chunk->size_allocated, "0123456789", 1);
 			ft_putstr_fd(" bytes\n", 1);
-			*total_size += size_to_add_to_total + ALLIGN_HEAP;
+			*total_size += size_to_add_to_total + ALLIGN_CHUNK;
 			chunk = chunk->next;
 		}
+		*total_size += ALLIGN_BLOCK;
 		block = block->next;
 	}
 }
