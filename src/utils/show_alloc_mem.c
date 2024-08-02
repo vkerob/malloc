@@ -73,7 +73,10 @@ void	show_alloc_mem()
 
 	pthread_mutex_lock(&lock);
 	if (data == NULL)
+	{
+		pthread_mutex_unlock(&lock);
 		return ;
+	}
 	if (data->tiny_heap && data->tiny_heap->start && data->tiny_heap->start->chunk)
 	{
 		ft_putstr_fd("TINY", 1);

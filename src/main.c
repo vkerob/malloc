@@ -344,7 +344,7 @@ void	basic_test_heap()
 int main()
 {
 	//basic_test_heap();
-	alloacte_test_100();
+	//alloacte_test_100();
 	
 	return (0);
 }
