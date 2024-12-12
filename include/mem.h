@@ -19,13 +19,12 @@
 
 #define MEN_ALLIGN 				16
 #define ALLIGN_DATA 			(size_t)align_address((void *)sizeof(t_data))
-#define ALLIGN_BLOCK 			(size_t)align_address((void *)sizeof(t_block))
-#define ALLIGN_CHUNK 		(size_t)align_address((void *)sizeof(t_chunk))
-#define ALLIGN_HEAP 			(size_t)align_address((void *)sizeof(t_heap))
-#define ALLIGN_LARGE_HEAP 		(size_t)align_address((void *)sizeof(t_large_heap))
+#define ALIGN_BLOCK 			(size_t)align_address((void *)sizeof(t_block))
+#define ALIGN_CHUNK 			(size_t)align_address((void *)sizeof(t_chunk))
+#define ALIGN_HEAP 				(size_t)align_address((void *)sizeof(t_heap))
+#define ALIGN_LARGE_HEAP 		(size_t)align_address((void *)sizeof(t_large_heap))
 // This implementation initializes a struct (data) at the beginning of 64 bytes. For example:
-// Minimum allocation: 64 bytes (data) + 16 bytes * 2 (heap) = 96 bytes + type_size (TINY_SIZE, SMALL_SIZE, LARGE) 
-
+// Minimum allocation: 64 bytes (data) + 16 bytes * 2 (heap) = 96 bytes + type_size (TINY_SIZE, SMALL_SIZE, LARGE)
 
 // Here we determine the maximum size of an allocation in each type of heap.
 // We want to have a minimum of 100 allocations in each block (trying to reproduce the behavior of the real malloc and respecting the 42 subject).
@@ -34,15 +33,15 @@
 // As a precaution, we subtract 16 bytes from the result to ensure that we can allocate 100 allocations because, for example,
 // if we allocate 100 allocations of 115 bytes + 48 bytes (chunk) = 163 bytes, we are going to align the address to 176 bytes and
 // we will not be able to allocate 100 allocations because 100 * 176 = 17600 > 16384.
-// so if a user tries to allocate 112 bytes, we will be sure that we can allocate 100 allocations of the same size because in the worst case we will have 100 * (112 + 48) = 16000 < 16384.
+// So if a user tries to allocate 112 bytes, we will be sure that we can allocate 100 allocations of the same size because in the worst case we will have 100 * (112 + 48) = 16000 < 16384.
 // 48 bytes are the size of the chunk metadata for each allocation.
-// Same logic for the Small heap: (524288 - 48) / 100 = 5242 bytes - 48 (chunk) = 5194 - 16 bytes (alignment) = 5178 bytes + 6 bytes (alignment) = 5184 bytes
-// to sum up :
+// The same logic applies for the Small heap: (524288 - 48) / 100 = 5242 bytes - 48 (chunk) = 5194 - 16 bytes (alignment) = 5178 bytes + 6 bytes (alignment) = 5184 bytes
+// To sum up:
 // TINY_MAX_SIZE_ALLOC <= 112 bytes
 // SMALL_MAX_SIZE_ALLOC > 112 and <= 5184 bytes
 // LARGE_MAX_SIZE_ALLOC > 5184 bytes
-#define TINY_MAX_SIZE_ALLOC		(size_t)align_address((void *)(size_t)((TINY_SIZE - ALLIGN_BLOCK) / 100) - MEN_ALLIGN - ALLIGN_CHUNK)	// (16384 - 48) / 100 = 163 bytes - 16 bytes (allign) - 48 (chunk) = 99 bytes + 13 bytes (allign) = 112 bytes
-#define SMALL_MAX_SIZE_ALLOC	(size_t)align_address((void *)(size_t)((SMALL_SIZE - ALLIGN_BLOCK) / 100) - MEN_ALLIGN - ALLIGN_CHUNK)	// (524288 - 48) / 100 = 5242 bytes - 16 bytes (allign) - 48 (chunk) = 5178 bytes + 6 bytes (allign) = 5184 bytes
+#define TINY_MAX_SIZE_ALLOC		(size_t)align_address((void *)(size_t)((TINY_SIZE - ALIGN_BLOCK) / 100) - ALIGN_CHUNK - MEN_ALLIGN)		// (16384 - 48) / 100 = 163 bytes - 16 bytes (align) - 48 (chunk) = 99 bytes + 13 bytes (align) = 112 bytes
+#define SMALL_MAX_SIZE_ALLOC	(size_t)align_address((void *)(size_t)((SMALL_SIZE - ALIGN_BLOCK) / 100) - ALIGN_CHUNK - MEN_ALLIGN)	// (524288 - 48) / 100 = 5242 bytes - 16 bytes (align) - 48 (chunk) = 5178 bytes + 6 bytes (align) = 5184 bytes
 
 
 

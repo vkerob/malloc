@@ -38,10 +38,10 @@ static void	show_heap(t_heap *heap, size_t *total_size)
 			ft_putstr_fd(" : ", 1);
 			ft_putnbr_base_fd(chunk->size_allocated, "0123456789", 1);
 			ft_putstr_fd(" bytes\n", 1);
-			*total_size += size_to_add_to_total + ALLIGN_CHUNK;
+			*total_size += size_to_add_to_total + ALIGN_CHUNK;
 			chunk = chunk->next;
 		}
-		*total_size += ALLIGN_BLOCK;
+		*total_size += ALIGN_BLOCK;
 		block = block->next;
 	}
 }
@@ -62,7 +62,7 @@ void	show_large_heap(size_t *total_size)
 		ft_putstr_fd(" : ", 1);
 		ft_putnbr_base_fd(large_heap->size_allocated, "0123456789", 1);
 		ft_putstr_fd(" bytes\n", 1);
-		*total_size += size_to_add_to_total + ALLIGN_LARGE_HEAP;
+		*total_size += size_to_add_to_total + ALIGN_LARGE_HEAP;
 		large_heap = large_heap->next;
 	}
 }

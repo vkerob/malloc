@@ -6,10 +6,10 @@ static void	set_new_chunk_after_block(t_block *block, size_t size, size_t size_t
 
 	t_chunk	*new_chunk;
 
-	new_chunk = (void *)block + ALLIGN_BLOCK;
+	new_chunk = (void *)block + ALIGN_BLOCK;
 	new_chunk->parent_block = block;
-	block->free_size -= size + ALLIGN_CHUNK + size_to_add_to_align_address;
-	new_chunk->size_after = block->size_after - size - size_to_add_to_align_address - ALLIGN_CHUNK;
+	block->free_size -= size + ALIGN_CHUNK + size_to_add_to_align_address;
+	new_chunk->size_after = block->size_after - size - size_to_add_to_align_address - ALIGN_CHUNK;
 	block->size_after = 0;
 
 	new_chunk->next =  block->chunk;
@@ -20,7 +20,7 @@ static void	set_new_chunk_after_block(t_block *block, size_t size, size_t size_t
 
 	block->chunk = new_chunk;
 
-	new_chunk->start = (void*)new_chunk + ALLIGN_CHUNK;
+	new_chunk->start = (void*)new_chunk + ALIGN_CHUNK;
 	new_chunk->size_allocated = size;
 
 	data->chunk_start = new_chunk->start;
@@ -34,9 +34,9 @@ bool	set_after_block(t_block *block, size_t size)
 
 	size_t	size_to_add_to_align_address;
 
-	size_to_add_to_align_address = (size_t)align_address((void *)block + ALLIGN_BLOCK + size) - (size_t)block - ALLIGN_BLOCK - size;
+	size_to_add_to_align_address = (size_t)align_address((void *)block + ALIGN_BLOCK + size) - (size_t)block - ALIGN_BLOCK - size;
 
-	if (block->size_after >= size + size_to_add_to_align_address + ALLIGN_CHUNK)
+	if (block->size_after >= size + size_to_add_to_align_address + ALIGN_CHUNK)
 	{
 		set_new_chunk_after_block(block, size, size_to_add_to_align_address);
 		return (true);
@@ -55,14 +55,14 @@ static void	set_new_chunk_after_chunk(t_chunk *prev_new_chunk, size_t size, size
 
 	new_chunk = prev_new_chunk->start + (size_t)align_address((void *)prev_new_chunk + prev_new_chunk->size_allocated) - (size_t)prev_new_chunk;
 	new_chunk->parent_block = prev_new_chunk->parent_block;
-	prev_new_chunk->parent_block->free_size -= size + ALLIGN_CHUNK + size_to_add_to_align_address; // if size = 4 size_to_add_to_align_address = 12 with a 16 bytes alignement
-	new_chunk->size_after = prev_new_chunk->size_after - size - size_to_add_to_align_address - ALLIGN_CHUNK;
+	prev_new_chunk->parent_block->free_size -= size + ALIGN_CHUNK + size_to_add_to_align_address; // if size = 4 size_to_add_to_align_address = 12 with a 16 bytes alignement
+	new_chunk->size_after = prev_new_chunk->size_after - size - size_to_add_to_align_address - ALIGN_CHUNK;
 	prev_new_chunk->size_after = 0;
-	new_chunk->start = (void*)new_chunk + ALLIGN_CHUNK;
+	new_chunk->start = (void*)new_chunk + ALIGN_CHUNK;
 
 	link_chunk(new_chunk, prev_new_chunk);
 
-	new_chunk->start = (void*)new_chunk + ALLIGN_CHUNK;
+	new_chunk->start = (void*)new_chunk + ALIGN_CHUNK;
 	new_chunk->size_allocated = size;
 
 	data->chunk_start = new_chunk->start;
@@ -81,10 +81,10 @@ bool	set_after_chunk(t_block *block, size_t size)
 
 	while (prev_new_chunk)
 	{
-		size_to_add_to_align_address = (size_t)align_address((void *)prev_new_chunk->start + ALLIGN_CHUNK + size)
-		- (size_t)prev_new_chunk->start - ALLIGN_CHUNK - size;
+		size_to_add_to_align_address = (size_t)align_address((void *)prev_new_chunk->start + ALIGN_CHUNK + size)
+		- (size_t)prev_new_chunk->start - ALIGN_CHUNK - size;
 
-		if (prev_new_chunk->size_after >= size + size_to_add_to_align_address + ALLIGN_CHUNK)
+		if (prev_new_chunk->size_after >= size + size_to_add_to_align_address + ALIGN_CHUNK)
 		{
 			set_new_chunk_after_chunk(prev_new_chunk, size, size_to_add_to_align_address);
 			return (true);

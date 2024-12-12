@@ -35,7 +35,7 @@ void	free(void *ptr)
 	else if (type == LARGE)
 	{
 		unlink_large_heap(used_large_heap);
-		munmap(used_large_heap, used_large_heap->size_allocated + ALLIGN_LARGE_HEAP);
+		munmap(used_large_heap, used_large_heap->size_allocated + ALIGN_LARGE_HEAP);
 	}
 	else
 	{
