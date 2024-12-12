@@ -90,9 +90,9 @@ bool	test_tiny4(int show)
 bool	test_small1(int show)
 {
 	char *str1 = malloc(2556 * sizeof(char));
-	char *str2 = malloc(2556 * sizeof(char));
-	char *str3 = malloc(2557 * sizeof(char));
-	char *str4 = malloc(2556 * sizeof(char));
+	char *str2 = malloc(2560 * sizeof(char));
+	char *str3 = malloc(5184 * sizeof(char));
+	char *str4 = malloc(5185 * sizeof(char));
 	(void)str1;
 	(void)str2;
 	(void)str3;
@@ -343,7 +343,7 @@ void	basic_test_heap()
 
 int main()
 {
-	//basic_test_heap();
+	basic_test_heap();
 	//alloacte_test_100();
 	
 	return (0);

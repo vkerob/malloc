@@ -28,19 +28,21 @@
 
 
 // Here we determine the maximum size of an allocation in each type of heap.
-// We want to have a minimum of 100 allocations in each heap (trying to reproduce the behavior of the real malloc and respecting the 42 subject).
+// We want to have a minimum of 100 allocations in each block (trying to reproduce the behavior of the real malloc and respecting the 42 subject).
 // How we calculate the maximum size of an allocation in each heap:
-// For Tiny heap: (16384 - 48) / 100 = 115 bytes - 16 bytes (alignment) = 99 bytes + 13 bytes (alignment) = 112 bytes
+// For Tiny heap: (16384 - 48 (block)) / 100 = 163 bytes - 48 (chunk) = 115 - 16 bytes (alignment) = 99 bytes + 13 bytes (alignment) = 112 bytes
 // As a precaution, we subtract 16 bytes from the result to ensure that we can allocate 100 allocations because, for example,
-// if we allocate 100 allocations of 113 bytes + 48 bytes (chunk) = 161 bytes, we are going to align the address to 176 bytes and
+// if we allocate 100 allocations of 115 bytes + 48 bytes (chunk) = 163 bytes, we are going to align the address to 176 bytes and
 // we will not be able to allocate 100 allocations because 100 * 176 = 17600 > 16384.
-// Same logic for the Small heap: (524288 - 48) / 100 = 5242 bytes - 16 bytes (alignment) = 5226 bytes + 6 bytes (alignment) = 5232 bytes
+// so if a user tries to allocate 112 bytes, we will be sure that we can allocate 100 allocations of the same size because in the worst case we will have 100 * (112 + 48) = 16000 < 16384.
+// 48 bytes are the size of the chunk metadata for each allocation.
+// Same logic for the Small heap: (524288 - 48) / 100 = 5242 bytes - 48 (chunk) = 5194 - 16 bytes (alignment) = 5178 bytes + 6 bytes (alignment) = 5184 bytes
 // to sum up :
-// TINY_MAX_SIZE_ALLOC = 99 bytes
-// SMALL_MAX_SIZE_ALLOC = 2560 bytes
-// LARGE_MAX_SIZE_ALLOC > 2560 bytes
-#define TINY_MAX_SIZE_ALLOC		(size_t)align_address((void *)(size_t)((TINY_SIZE - ALLIGN_BLOCK) / 100) - ALLIGN_CHUNK - MEN_ALLIGN)		// (16384 - 48) / 100 = 115 bytes - 16 bytes (allign) = 99 bytes + 13 bytes (allign) = 112 bytes
-#define SMALL_MAX_SIZE_ALLOC	(size_t)align_address((void *)(size_t)((SMALL_SIZE - ALLIGN_BLOCK) / 100) - ALLIGN_CHUNK - MEN_ALLIGN)	// (524288 - 48) / 100 = 5242 bytes - 16 bytes (allign) = 5226 bytes + 6 bytes (allign) = 5232 bytes
+// TINY_MAX_SIZE_ALLOC <= 112 bytes
+// SMALL_MAX_SIZE_ALLOC > 112 and <= 5184 bytes
+// LARGE_MAX_SIZE_ALLOC > 5184 bytes
+#define TINY_MAX_SIZE_ALLOC		(size_t)align_address((void *)(size_t)((TINY_SIZE - ALLIGN_BLOCK) / 100) - MEN_ALLIGN - ALLIGN_CHUNK)	// (16384 - 48) / 100 = 163 bytes - 16 bytes (allign) - 48 (chunk) = 99 bytes + 13 bytes (allign) = 112 bytes
+#define SMALL_MAX_SIZE_ALLOC	(size_t)align_address((void *)(size_t)((SMALL_SIZE - ALLIGN_BLOCK) / 100) - MEN_ALLIGN - ALLIGN_CHUNK)	// (524288 - 48) / 100 = 5242 bytes - 16 bytes (allign) - 48 (chunk) = 5178 bytes + 6 bytes (allign) = 5184 bytes
 
 
 
