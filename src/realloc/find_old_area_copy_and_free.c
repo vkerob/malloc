@@ -1,4 +1,4 @@
-#include "../../include/mem.h"
+#include "../../includes/malloc.h"
 
 static void	copy_and_free(t_chunk *chunk_tmp, void *ptr, size_t size)
 {
@@ -10,7 +10,9 @@ static void	copy_and_free(t_chunk *chunk_tmp, void *ptr, size_t size)
 		((char *)data->chunk_start)[i] = ((char *)ptr)[i];
 		i++;
 	}
+	void *tmp_chunk_start = data->chunk_start;
 	free(ptr);
+	data->chunk_start = tmp_chunk_start;
 }
 
 static void	copy_and_free_large(t_large_heap *large_heap_tmp, void *ptr, size_t size)

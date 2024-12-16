@@ -1,4 +1,4 @@
-#include "../../include/mem.h"
+#include "../../includes/malloc.h"
 
 void	free_heap(t_heap *heap)
 {
@@ -41,6 +41,9 @@ void	free_all(void)
 	if (data->large_heap)
 		free_large_heap(data->large_heap);
 
-	free(data);
-	pthread_mutex_unlock(&lock);
+	if (data)
+	{
+		free(data);
+		data = NULL;
+	}
 }

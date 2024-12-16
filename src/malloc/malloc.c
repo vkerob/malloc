@@ -1,7 +1,7 @@
-#include "../../include/mem.h"
+#include "../../includes/malloc.h"
 
 t_data	*data = NULL;
-pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+
 
 void	*malloc(size_t size)
 {
@@ -11,6 +11,7 @@ void	*malloc(size_t size)
 	// this function allocates a block of memory, for more details of how many bytes are allocated check the mem.h
 	// if the size is 0, return NULL else return the pointer to the start of the allocated memory for the user
 
+	initialize_mutex();
 	pthread_mutex_lock(&lock);
 
 	if (size == 0)
@@ -48,5 +49,6 @@ void	*malloc(size_t size)
 	
 	// if error
 	free_all();
+	pthread_mutex_unlock(&lock);
 	return (NULL);
 }

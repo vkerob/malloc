@@ -47,7 +47,6 @@
 
 extern pthread_mutex_t lock;
 
-
 typedef struct	data // 56 bytes
 {
 	struct heap			*tiny_heap;
@@ -98,6 +97,7 @@ typedef struct chunk // 48 bytes
 
 // general functions
 void	show_alloc_mem();
+void	initialize_mutex();
 void	free(void *ptr);
 void	*malloc(size_t size);
 void	*realloc(void *ptr, size_t size);

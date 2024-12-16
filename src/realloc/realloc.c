@@ -1,5 +1,4 @@
-#include "../../include/mem.h"
-
+#include "../../includes/malloc.h"
 
 void	*realloc(void *ptr, size_t size)
 {
@@ -8,6 +7,7 @@ void	*realloc(void *ptr, size_t size)
 	t_heap	*heap_tmp;
 	int		type;
 
+	initialize_mutex();
 	pthread_mutex_lock(&lock);
 
 	if (size == 0)
@@ -29,7 +29,6 @@ void	*realloc(void *ptr, size_t size)
 		if (data->error == false)
 			// copy the old data to the new area and free the old area
 			find_old_area_copy_and_free(ptr, size);
-	
 	}
 	else
 	{
@@ -46,5 +45,6 @@ void	*realloc(void *ptr, size_t size)
 
 	// error detected, free all allocated memory
 	free_all();
+	pthread_mutex_unlock(&lock);
 	return (NULL);
 }

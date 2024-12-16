@@ -1,4 +1,5 @@
-#include "../../include/mem.h"
+#include "../../includes/malloc.h"
+
 
 static void	ft_putnbr_base_fd(unsigned long nbr, char *base, int fd)
 {
@@ -33,15 +34,14 @@ static void	show_heap(t_heap *heap, size_t *total_size)
 			ft_putnbr_base_fd((unsigned long)(chunk->start), "0123456789ABCDEF", 1);
 			ft_putstr_fd(" - ", 1);
 			ft_putstr_fd("0x", 1);
-			size_t size_to_add_to_total = (size_t)align_address((void *)chunk->start + chunk->size_allocated) - (size_t)chunk->start;
+			size_t size_to_add_to_total = (chunk->size_allocated);
 			ft_putnbr_base_fd((unsigned long)((size_t)align_address((void *)chunk->start + chunk->size_allocated)), "0123456789ABCDEF", 1);
 			ft_putstr_fd(" : ", 1);
 			ft_putnbr_base_fd(chunk->size_allocated, "0123456789", 1);
 			ft_putstr_fd(" bytes\n", 1);
-			*total_size += size_to_add_to_total + ALIGN_CHUNK;
+			*total_size += size_to_add_to_total;
 			chunk = chunk->next;
 		}
-		*total_size += ALIGN_BLOCK;
 		block = block->next;
 	}
 }
@@ -57,12 +57,12 @@ void	show_large_heap(size_t *total_size)
 		ft_putnbr_base_fd((unsigned long)(large_heap->start), "0123456789ABCDEF", 1);
 		ft_putstr_fd(" - ", 1);
 		ft_putstr_fd("0x", 1);
-		size_t size_to_add_to_total = (size_t)align_address((void *)large_heap->start + large_heap->size_allocated) - (size_t)large_heap->start;
+		size_t size_to_add_to_total = large_heap->size_allocated;
 		ft_putnbr_base_fd((unsigned long)((size_t)align_address((void *)large_heap->start + large_heap->size_allocated)), "0123456789ABCDEF", 1);
 		ft_putstr_fd(" : ", 1);
 		ft_putnbr_base_fd(large_heap->size_allocated, "0123456789", 1);
 		ft_putstr_fd(" bytes\n", 1);
-		*total_size += size_to_add_to_total + ALIGN_LARGE_HEAP;
+		*total_size += size_to_add_to_total;
 		large_heap = large_heap->next;
 	}
 }
@@ -71,6 +71,7 @@ void	show_alloc_mem()
 {
 	size_t			total_size = 0;
 
+	initialize_mutex();
 	pthread_mutex_lock(&lock);
 	if (data == NULL)
 	{

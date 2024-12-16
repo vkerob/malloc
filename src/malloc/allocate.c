@@ -1,4 +1,4 @@
-#include "../../include/mem.h"
+#include "../../includes/malloc.h"
 
 // allocates the heap passed as argument if it doesn't exist, a new block on him and allocates a new used chunk on the block of the size passed as argument 
 void	found_space_or_allocate(t_heap *heap, size_t size, int type_size)

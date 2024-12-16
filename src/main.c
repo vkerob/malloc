@@ -1,4 +1,4 @@
-#include "../include/mem.h"
+#include "../includes/malloc.h"
 
 bool	test_tiny1(int show)
 {
@@ -343,7 +343,7 @@ void	basic_test_heap()
 
 int main()
 {
-	basic_test_heap();
+	//basic_test_heap();
 	//alloacte_test_100();
 	
 	return (0);

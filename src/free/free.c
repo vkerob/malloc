@@ -1,4 +1,4 @@
-#include "../../include/mem.h"
+#include "../../includes/malloc.h"
 
 void	free(void *ptr)
 {
@@ -7,13 +7,12 @@ void	free(void *ptr)
 	// if the pointer is found, defragment the chunk, unlink the chunk, 
 	// check if the block is unused and free the block only if it's not the last block
 
-
-
-	t_chunk	*chunk;
+	t_chunk			*chunk;
 	t_large_heap	*used_large_heap;
 	t_heap			**heap_tmp;
 	size_t			type = 0;
 
+	initialize_mutex();
 	pthread_mutex_lock(&lock);
 
 	if (ptr == NULL)
@@ -25,6 +24,7 @@ void	free(void *ptr)
 	data->chunk_start = NULL;
 	find_chunk_ptr(&chunk, &used_large_heap, ptr, &type);
 
+	// try to find the chunk in the heap tiny, small or large
 	if (type == TINY_SIZE || type == SMALL_SIZE)
 	{
 		heap_tmp = (type == TINY_SIZE) ? &(data->tiny_heap) : &(data->small_heap);
@@ -37,6 +37,7 @@ void	free(void *ptr)
 		unlink_large_heap(used_large_heap);
 		munmap(used_large_heap, used_large_heap->size_allocated + ALIGN_LARGE_HEAP);
 	}
+	// if type is equal to 0, the pointer is not found so it's an error
 	else
 	{
 		ft_printf("Error: impossible to free this pointer\n");
