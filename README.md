@@ -6,7 +6,7 @@ The project, as defined by school 42, aims to implement the malloc function from
 WARNING! This implementation is not that of the libc; it only follows certain principles and is therefore simplified.\
 If you want to see what the libc implementation looks like, a link is provided in the Documentation section.
 
-## IN PROGESS
+## Importante informations are in malloc.h 
 
 ## Documentation
 
