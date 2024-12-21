@@ -19,8 +19,7 @@ SRC=	src/malloc/malloc.c \
 		src/utils/set_new_chunk.c \
 		src/utils/free_all.c \
 		src/utils/link.c \
-		src/utils/unlink.c \
-		src/utils/initialize_mutex.c \
+		src/utils/unlink.c
 
 
 OBJ_DIR = obj

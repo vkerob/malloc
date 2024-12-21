@@ -11,7 +11,9 @@ static void	copy_and_free(t_chunk *chunk_tmp, void *ptr, size_t size)
 		i++;
 	}
 	void *tmp_chunk_start = data->chunk_start;
+	pthread_mutex_unlock(&lock);
 	free(ptr);
+	pthread_mutex_lock(&lock);
 	data->chunk_start = tmp_chunk_start;
 }
 

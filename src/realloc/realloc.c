@@ -1,20 +1,39 @@
 #include "../../includes/malloc.h"
 
+static bool special_case(void *ptr, size_t size, void **ret)
+{
+	// if the size is 0, return NULL else return the pointer to the start of the allocated memory for the user
+	if (size == 0)
+	{
+		pthread_mutex_unlock(&lock);
+		free(ptr);
+		pthread_mutex_lock(&lock);
+		*ret = data->chunk_start;
+		pthread_mutex_unlock(&lock);
+		return (true);
+	}
+
+	if (ptr == NULL)
+	{
+		pthread_mutex_unlock(&lock);
+		*ret = malloc(size);
+		return (true);
+	}
+	return (false);
+}
+
 void	*realloc(void *ptr, size_t size)
 {
 	// realloc the memory area pointed to by ptr to size bytes
 	// if ptr is NULL, the call is equivalent to malloc(size)
 	t_heap	*heap_tmp;
 	int		type;
+	void 	*ret;
 
-	initialize_mutex();
 	pthread_mutex_lock(&lock);
 
-	if (size == 0)
-	{
-		pthread_mutex_unlock(&lock);
-		return (NULL);
-	}
+	if (special_case(ptr, size, &ret))
+		return (ret);
 
 	data->chunk_start = NULL;
 
@@ -45,6 +64,5 @@ void	*realloc(void *ptr, size_t size)
 
 	// error detected, free all allocated memory
 	free_all();
-	pthread_mutex_unlock(&lock);
 	return (NULL);
 }

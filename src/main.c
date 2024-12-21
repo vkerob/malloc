@@ -341,10 +341,77 @@ void	basic_test_heap()
 	test_large();
 }
 
+// #include <pthread.h>
+// #include <string.h> // Pour NULL
+// #include <stdio.h> // Pour ft_printf
+
+// // Taille de mémoire à allouer
+// #define ALLOCATION_SIZE 128
+// // Nombre de threads à lancer
+// #define NUM_THREADS 5
+
+// void* thread_function(void* arg) {
+//     int thread_id = *(int*)arg;
+
+//     ft_printf("Thread %d démarré\n", thread_id);
+
+//     // Allocation de mémoire
+//     char* ptr = (char*)malloc(ALLOCATION_SIZE);
+//     if (!ptr) {
+//         ft_printf("Thread %d: malloc a échoué\n", thread_id);
+//         pthread_exit(NULL);
+//     }
+
+//     ft_printf("Thread %d: mémoire allouée à l'adresse %p\n", thread_id, (void*)ptr);
+
+//     // Initialisation de la mémoire avec ft_strlcpy et ft_strlcat
+//     ft_strlcpy(ptr, "Thread ", ALLOCATION_SIZE);
+//     char thread_id_str[16];
+//     ft_printf(thread_id_str, sizeof(thread_id_str), "%d", thread_id);  // Utilisation de ft_printf pour convertir thread_id
+//     ft_strlcat(ptr, thread_id_str, ALLOCATION_SIZE);
+//     ft_strlcat(ptr, " test", ALLOCATION_SIZE);
+//     ft_printf("Thread %d: mémoire initialisée avec contenu : %s\n", thread_id, ptr);
+
+//     // Libération de mémoire
+//     free(ptr);
+//     ft_printf("Thread %d: mémoire libérée\n", thread_id);
+
+//     pthread_exit(NULL);
+// }
+
+
+// int main() {
+// 	pthread_t threads[NUM_THREADS];
+// 	int thread_ids[NUM_THREADS];
+
+// 	for (int i = 0; i < NUM_THREADS; i++) {
+// 	    thread_ids[i] = i;
+// 	    if (pthread_create(&threads[i], NULL, thread_function, &thread_ids[i]) != 0) {
+// 	        ft_printf("Erreur lors de la création du thread %d\n", i);
+// 	        return EXIT_FAILURE;
+// 	    }
+// 	}
+
+// 	for (int i = 0; i < NUM_THREADS; i++) {
+// 	    pthread_join(threads[i], NULL);
+// 	}
+
+// 	ft_printf("Tous les threads ont terminé.\n");
+
+// 	return EXIT_SUCCESS;
+	
+// }
+
 int main()
 {
-	//basic_test_heap();
-	//alloacte_test_100();
-	
+	// basic_test_heap();
+	// alloacte_test_100();
+	// char *str1 = malloc(1 * sizeof(char));
+	// str1[0] = 'a';
+	// ft_printf("%s\n", str1);
+	// char *str2 = realloc(str1, 200 * sizeof(char));
+	// str2[1] = '\0';
+	// ft_printf("%s\n", str2);
+	// free(str2);
 	return (0);
 }

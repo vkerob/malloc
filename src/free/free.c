@@ -1,5 +1,24 @@
 #include "../../includes/malloc.h"
 
+static bool special_case(void *ptr)
+{
+	// if the size is 0, return NULL else return the pointer to the start of the allocated memory for the user
+	if (ptr == NULL)
+	{
+		data->chunk_start = NULL;
+		pthread_mutex_unlock(&lock);
+		return (true);
+	}
+
+	if (data == NULL)
+	{
+		ft_printf("free(): invalid pointer\n");
+		pthread_mutex_unlock(&lock);
+		return (true);
+	}
+	return (false);
+}
+
 void	free(void *ptr)
 {
 	// try to find the chunk in the heap tiny, small or large
@@ -12,11 +31,21 @@ void	free(void *ptr)
 	t_heap			**heap_tmp;
 	size_t			type = 0;
 
-	initialize_mutex();
 	pthread_mutex_lock(&lock);
+
+	if (special_case(ptr))
+		return ;
 
 	if (ptr == NULL)
 	{
+		data->chunk_start = NULL;
+		pthread_mutex_unlock(&lock);
+		return ;
+	}
+
+	if (data == NULL)
+	{
+		ft_printf("free(): invalid pointer\n");
 		pthread_mutex_unlock(&lock);
 		return ;
 	}
@@ -40,7 +69,7 @@ void	free(void *ptr)
 	// if type is equal to 0, the pointer is not found so it's an error
 	else
 	{
-		ft_printf("Error: impossible to free this pointer\n");
+		ft_printf("free(): invalid pointer\n");
 		pthread_mutex_unlock(&lock);
 		return ;
 	}

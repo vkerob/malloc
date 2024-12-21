@@ -71,7 +71,6 @@ void	show_alloc_mem()
 {
 	size_t			total_size = 0;
 
-	initialize_mutex();
 	pthread_mutex_lock(&lock);
 	if (data == NULL)
 	{

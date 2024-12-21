@@ -46,4 +46,5 @@ void	free_all(void)
 		free(data);
 		data = NULL;
 	}
+	pthread_mutex_unlock(&lock);
 }
