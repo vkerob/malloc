@@ -18,11 +18,11 @@
 #define LARGE 					1
 
 #define MEN_ALLIGN 				16
-#define ALLIGN_DATA 			(size_t)align_address((void *)sizeof(t_data))
-#define ALIGN_BLOCK 			(size_t)align_address((void *)sizeof(t_block))
-#define ALIGN_CHUNK 			(size_t)align_address((void *)sizeof(t_chunk))
-#define ALIGN_HEAP 				(size_t)align_address((void *)sizeof(t_heap))
-#define ALIGN_LARGE_HEAP 		(size_t)align_address((void *)sizeof(t_large_heap))
+#define ALLIGN_DATA 			(size_t)align_address((void *)sizeof(t_data)) // 64 bytes
+#define ALIGN_BLOCK 			(size_t)align_address((void *)sizeof(t_block)) // 48 bytes
+#define ALIGN_CHUNK 			(size_t)align_address((void *)sizeof(t_chunk)) // 48 bytes
+#define ALIGN_HEAP 				(size_t)align_address((void *)sizeof(t_heap)) // 16 bytes
+#define ALIGN_LARGE_HEAP 		(size_t)align_address((void *)sizeof(t_large_heap)) // 32 bytes
 // This implementation initializes a struct (data) at the beginning of 64 bytes. For example:
 // Minimum allocation: 64 bytes (data) + 16 bytes * 2 (heap) = 96 bytes + type_size (TINY_SIZE, SMALL_SIZE, LARGE)
 

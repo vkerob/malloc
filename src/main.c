@@ -402,10 +402,51 @@ void	basic_test_heap()
 	
 // }
 
+void test_strace()
+{
+	char *tab1[100];
+	char *tab2[100];
+	char *tab3[100];
+
+	for (int i = 0; i < 100; i++)
+	{
+		tab1[i] = malloc(112 * sizeof(char));
+		(void)tab1[i];
+	}
+	for (int i = 0; i < 100; i++)
+	{
+		tab2[i] = malloc(112 * sizeof(char));
+		(void)tab2[i];
+	}
+	for (int i = 0; i < 100; i++)
+	{
+		tab3[i] = malloc(112 * sizeof(char));
+		(void)tab3[i];
+	}
+	for (int i = 0; i < 100; i++)
+	{
+		free(tab1[i]);
+	}
+	for (int i = 0; i < 100; i++)
+	{
+		free(tab2[i]);
+	}
+	for (int i = 0; i < 100; i++)
+	{
+		free(tab3[i]);
+	}
+}
+
+
+// make test && strace --output=test.txt ./test && cat test.txt | grep "mmap" && cat test.txt | grep "munmap"
+
 int main()
 {
 	// basic_test_heap();
+	
 	// alloacte_test_100();
+
+	// realloc test
 	// char *str1 = malloc(1 * sizeof(char));
 	// str1[0] = 'a';
 	// ft_printf("%s\n", str1);
@@ -413,5 +454,9 @@ int main()
 	// str2[1] = '\0';
 	// ft_printf("%s\n", str2);
 	// free(str2);
+
+	// test_strace();
+
+	
 	return (0);
 }

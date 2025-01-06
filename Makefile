@@ -1,6 +1,6 @@
 CC=gcc
 
-CFLAGS= -Wall -Wextra -fPIC -g
+CFLAGS= -Wall -Wextra -Werror -fPIC -g
 
 LIBFT_DIR=./libft
 LIBFT= $(LIBFT_DIR)/libft.a
