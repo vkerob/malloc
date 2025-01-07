@@ -19,7 +19,10 @@ void	link_large_heap(t_large_heap *new_large_heap, t_large_heap *large_heap_prev
 
 void	link_chunk(t_chunk *chunk, t_chunk *chunk_prev)
 {
-	chunk->next = NULL;
+	chunk->next = chunk_prev->next;
+	pthread_mutex_unlock(&lock);
+	ft_printf("chunk->next = %p\n", chunk->next);
+	pthread_mutex_lock(&lock);
 	chunk->prev = chunk_prev;
 
 	if (chunk_prev)

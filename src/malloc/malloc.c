@@ -2,7 +2,7 @@
 
 t_data	*data = NULL;
 
-pthread_mutex_t lock;
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 
 void	*malloc(size_t size)

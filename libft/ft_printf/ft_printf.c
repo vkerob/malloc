@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: neweth <neweth@student.42.fr>              +#+  +:+       +#+        */
+/*   By: vkerob <vkerob@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 16:12:19 by vkerob            #+#    #+#             */
-/*   Updated: 2022/12/06 22:32:53 by neweth           ###   ########.fr       */
+/*   Updated: 2025/01/07 14:22:55 by vkerob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include"ft_printf.h"
+#include"../../includes/malloc.h"
 
 static int	ft_forest(char c2, va_list va)
 {
@@ -70,6 +71,7 @@ int	ft_printf(const char *s, ...)
 {
 	va_list	va;
 	int		ct;
+	pthread_mutex_lock(&lock);
 
 	ct = 0;
 	if (!s)
@@ -77,13 +79,7 @@ int	ft_printf(const char *s, ...)
 	va_start (va, s);
 	ct = ft_parcours(s, va);
 	va_end (va);
+
+	pthread_mutex_unlock(&lock);
 	return (ct);
 }
-
-/*
-#include<stdio.h>
-
-int	main(void)
-{
-	printf("%d\n", ft_printf("je test d'ecrire%"));
-}*/

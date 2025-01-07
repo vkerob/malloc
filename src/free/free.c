@@ -6,16 +6,17 @@ static bool special_case(void *ptr)
 	if (ptr == NULL)
 	{
 		data->chunk_start = NULL;
-		pthread_mutex_unlock(&lock);
 		return (true);
 	}
 
 	if (data == NULL)
 	{
-		ft_printf("free(): invalid pointer\n");
 		pthread_mutex_unlock(&lock);
+		ft_printf("free(): invalid pointer\n");
+		pthread_mutex_lock(&lock);
 		return (true);
 	}
+
 	return (false);
 }
 
@@ -34,18 +35,7 @@ void	free(void *ptr)
 	pthread_mutex_lock(&lock);
 
 	if (special_case(ptr))
-		return ;
-
-	if (ptr == NULL)
 	{
-		data->chunk_start = NULL;
-		pthread_mutex_unlock(&lock);
-		return ;
-	}
-
-	if (data == NULL)
-	{
-		ft_printf("free(): invalid pointer\n");
 		pthread_mutex_unlock(&lock);
 		return ;
 	}
@@ -69,8 +59,8 @@ void	free(void *ptr)
 	// if type is equal to 0, the pointer is not found so it's an error
 	else
 	{
-		ft_printf("free(): invalid pointer\n");
 		pthread_mutex_unlock(&lock);
+		ft_printf("free(): invalid pointer\n");
 		return ;
 	}
 
