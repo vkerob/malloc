@@ -28,13 +28,8 @@ static void	copy_and_free_large(t_large_heap *large_heap_tmp, void *ptr, size_t 
 		i++;
 	}
 
-	if (large_heap_tmp->prev != NULL)
-		large_heap_tmp->prev->next = large_heap_tmp->next;
-
-	if (large_heap_tmp->next != NULL)
-		large_heap_tmp->next->prev = large_heap_tmp->prev;
-
-	munmap(large_heap_tmp->start, large_heap_tmp->size_allocated);
+	unlink_large_heap(large_heap_tmp);
+	munmap(large_heap_tmp, large_heap_tmp->size_allocated + ALIGN_LARGE_HEAP);
 }
 
 void	find_old_area_copy_and_free(void *ptr, size_t size)

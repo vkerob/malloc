@@ -6,9 +6,11 @@ void	unlink_large_heap(t_large_heap *large_heap)
 		large_heap->prev->next = large_heap->next;
 	else
 		data->large_heap = large_heap->next;
+
 	if (large_heap->next != NULL)
 		large_heap->next->prev = large_heap->prev;
 }
+
 
 void	unlink_block(t_block *block)
 {
@@ -20,12 +22,14 @@ void	unlink_block(t_block *block)
 		block->next->prev = block->prev;
 }
 
+
 void	unlink_chunk(t_chunk *chunk)
 {
 	if (chunk->prev != NULL)
 		chunk->prev->next = chunk->next;
 	else
 		chunk->parent_block->chunk = chunk->next;
+
 	if (chunk->next != NULL)
 		chunk->next->prev = chunk->prev;
 }

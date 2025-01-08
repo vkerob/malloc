@@ -1,33 +1,25 @@
 #include "../../includes/malloc.h"
 
-void	link_large_heap(t_large_heap *new_large_heap, t_large_heap *large_heap_prev)
+
+void link_chunk_after_block(t_block *block, t_chunk *new_chunk)
 {
-	new_large_heap->next = NULL;
+	new_chunk->next =  block->chunk;
+	new_chunk->prev = NULL;
+	
+	if (block->chunk)
+		block->chunk->prev = new_chunk;
 
-	if (large_heap_prev != NULL)
-	{
-		new_large_heap->prev = large_heap_prev;
-		large_heap_prev->next = new_large_heap;
-	}
-	else
-	{
-		data->large_heap = new_large_heap;
-		new_large_heap->prev = NULL;
-	}
-
+	block->chunk = new_chunk;
 }
 
-void	link_chunk(t_chunk *chunk, t_chunk *chunk_prev)
+
+void link_chunk_after_chunk(t_chunk *new_chunk, t_chunk *prev_new_chunk)
 {
-	chunk->next = chunk_prev->next;
-	pthread_mutex_unlock(&lock);
-	ft_printf("chunk->next = %p\n", chunk->next);
-	pthread_mutex_lock(&lock);
-	chunk->prev = chunk_prev;
+	new_chunk->next =  prev_new_chunk->next;
+	new_chunk->prev = prev_new_chunk;
 
-	if (chunk_prev)
-		chunk_prev->next = chunk;
-	else
-		chunk->parent_block->chunk = chunk;
+	if (prev_new_chunk->next)
+		prev_new_chunk->next->prev = new_chunk;
 
+	prev_new_chunk->next = new_chunk;
 }

@@ -464,27 +464,127 @@ void	realloc_test()
 	(void)str2;
 	(void)str3;
 	(void)str4;
-	show_alloc_mem();
 	str1 = realloc(str1, 1);
-	show_alloc_mem();
 	str2 = realloc(str2, 1);
-	show_alloc_mem();
 	str3 = realloc(str3, 1);
-	show_alloc_mem();
 	str4 = realloc(str4, 1);
-	show_alloc_mem();
 	free(str1);
 	free(str2);
 	free(str3);
 	free(str4);
 }
 
+void	realloc_test_tiny_to_small()
+{
+    char *str = malloc(100);
+    ft_printf("\nTest: tiny to small realloc\n");
+    show_alloc_mem();
+    str = realloc(str, 1000);
+    show_alloc_mem();
+    free(str);
+}
+
+void	realloc_test_small_to_large()
+{
+    char *str = malloc(1000);
+    ft_printf("\nTest: small to large realloc\n");
+    show_alloc_mem();
+    str = realloc(str, 10000);
+    show_alloc_mem();
+    free(str);
+}
+
+void	realloc_test_large_to_small()
+{
+    char *str = malloc(10000);
+    ft_printf("\nTest: large to small realloc\n");
+    show_alloc_mem();
+    str = realloc(str, 1000);
+    show_alloc_mem();
+    free(str);
+}
+
+void	realloc_test_null_ptr()
+{
+    char *str = NULL;
+    ft_printf("\nTest: realloc with NULL pointer\n");
+    str = realloc(str, 100);
+    show_alloc_mem();
+    free(str);
+}
+
+void	realloc_test_zero_size()
+{
+    char *str = malloc(100);
+    ft_printf("\nTest: realloc with zero size\n");
+    show_alloc_mem();
+    str = realloc(str, 0);
+    show_alloc_mem();
+}
+
+void	realloc_test_same_size()
+{
+    char *str = malloc(100);
+    ft_strlcpy(str, "Test string", 12);
+    ft_printf("\nTest: realloc with same size\n");
+    show_alloc_mem();
+    str = realloc(str, 100);
+    show_alloc_mem();
+    ft_printf("Content after realloc: %s\n", str);
+    free(str);
+}
+
+void	realloc_stress_test()
+{
+    char *ptrs[10];
+    ft_printf("\nTest: realloc stress test\n");
+    
+    // Initial allocations
+    for (int i = 0; i < 10; i++) {
+        ptrs[i] = malloc(50);
+    }
+    show_alloc_mem();
+
+    // Multiple reallocs
+    for (int i = 0; i < 10; i++) {
+        ptrs[i] = realloc(ptrs[i], 100 * (i + 1));
+    }
+    show_alloc_mem();
+
+    // Shrink some allocations
+    for (int i = 0; i < 5; i++) {
+        ptrs[i] = realloc(ptrs[i], 50);
+    }
+    show_alloc_mem();
+
+    // Free everything
+    for (int i = 0; i < 10; i++) {
+        free(ptrs[i]);
+    }
+}
+
+void	extended_realloc_tests()
+{
+    realloc_test_tiny_to_small();
+    realloc_test_small_to_large();
+    realloc_test_large_to_small();
+    realloc_test_null_ptr();
+    realloc_test_zero_size();
+    realloc_test_same_size();
+    realloc_stress_test();
+}
 
 // make test && strace --output=test.txt ./test && cat test.txt | grep "mmap" && cat test.txt | grep "munmap"
 
 int main()
-{    
-	realloc_test();
+{
+	char *str = malloc(100);
+	str[0] = 'a';
+	str[1] = 'b';
+	str[2] = 'c';
+	// realloc_test();
+    extended_realloc_tests();
+	show_alloc_mem();
     // thread_test();
     
     return (0);

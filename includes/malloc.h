@@ -124,8 +124,8 @@ void	unlink_chunk(t_chunk *chunk);
 void	unlink_block(t_block *block);
 
 // link functions
-void	link_chunk(t_chunk *chunk, t_chunk *chunk_prev);
-void	link_large_heap(t_large_heap *new_large_heap, t_large_heap *large_heap_prev);
+void 	link_chunk_after_chunk(t_chunk *new_chunk, t_chunk *prev_new_chunk);
+void	link_chunk_after_block(t_block *block, t_chunk *new_chunk);
 
 // realloc utils functions
 void	find_old_area_copy_and_free(void *ptr, size_t size);

@@ -40,7 +40,7 @@ void	*realloc(void *ptr, size_t size)
 	if (size <= TINY_MAX_SIZE_ALLOC || size <= SMALL_MAX_SIZE_ALLOC)
 	{
 		heap_tmp = (size <= TINY_MAX_SIZE_ALLOC) ? data->tiny_heap : data->small_heap;
-		type = (size <= TINY_MAX_SIZE_ALLOC) ? TINY_MAX_SIZE_ALLOC : SMALL_MAX_SIZE_ALLOC;
+		type = (size <= TINY_MAX_SIZE_ALLOC) ? SMALL_SIZE : SMALL_SIZE;
 
 		// find the area or allocate a new one
 		found_space_or_allocate(heap_tmp, size, type);

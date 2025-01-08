@@ -12,13 +12,7 @@ static void	set_new_chunk_after_block(t_block *block, size_t size, size_t size_t
 	new_chunk->size_after = block->size_after - size - size_to_add_to_align_address - ALIGN_CHUNK;
 	block->size_after = 0;
 
-	new_chunk->next =  block->chunk;
-	new_chunk->prev = NULL;
-	
-	if (block->chunk)
-		block->chunk->prev = new_chunk;
-
-	block->chunk = new_chunk;
+	link_chunk_after_block(block, new_chunk);
 
 	new_chunk->start = (void*)new_chunk + ALIGN_CHUNK;
 	new_chunk->size_allocated = size;
@@ -60,7 +54,7 @@ static void	set_new_chunk_after_chunk(t_chunk *prev_new_chunk, size_t size, size
 	prev_new_chunk->size_after = 0;
 	new_chunk->start = (void*)new_chunk + ALIGN_CHUNK;
 
-	link_chunk(new_chunk, prev_new_chunk);
+	link_chunk_after_chunk(new_chunk, prev_new_chunk);
 
 	new_chunk->start = (void*)new_chunk + ALIGN_CHUNK;
 	new_chunk->size_allocated = size;
