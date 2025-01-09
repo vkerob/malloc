@@ -578,14 +578,12 @@ void	extended_realloc_tests()
 
 int main()
 {
-	char *str = malloc(100);
-	str[0] = 'a';
-	str[1] = 'b';
-	str[2] = 'c';
-	// realloc_test();
+	basic_test_heap();
+	alloacte_test_100();
+	realloc_test();
     extended_realloc_tests();
 	show_alloc_mem();
-    // thread_test();
+    thread_test();
     
     return (0);
 }

@@ -107,9 +107,6 @@ static void	initialize_chunk(t_block *block, size_t size)
 
 void	allocate(t_heap *heap, size_t size, size_t type_size)
 {
-	pthread_mutex_unlock(&lock);
-	ft_printf("params: %p, %d, %d\n", heap, size, type_size);
-	pthread_mutex_lock(&lock);
 	// allocate a new block in the heap passed as argument and initialize the used user space
 
 	t_block	*block = NULL;
@@ -133,9 +130,6 @@ void	allocate(t_heap *heap, size_t size, size_t type_size)
 	}
 
 	// allocate the block
-	pthread_mutex_unlock(&lock);
-	ft_printf("type_size: %d\n", type_size);
-	pthread_mutex_lock(&lock);
 	block = mmap(NULL, type_size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
 	if (block == MAP_FAILED)

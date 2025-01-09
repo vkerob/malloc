@@ -59,7 +59,7 @@ void	free(void *ptr)
 	// if type is equal to 0, the pointer is not found so it's an error
 	else
 	{
-		pthread_mutex_unlock(&lock);
+		pthread_mutex_unlock(&lock); 
 		ft_printf("free(): invalid pointer\n");
 		return ;
 	}

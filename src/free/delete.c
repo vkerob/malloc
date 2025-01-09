@@ -8,6 +8,5 @@ void	check_if_block_is_unused(t_heap **heap, t_block **parent_block_chunk)
 	{
 		unlink_block((*parent_block_chunk));
 		munmap((*parent_block_chunk), (*heap)->size);
-		
 	}
 }
